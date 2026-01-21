@@ -33,6 +33,13 @@ public:
 	void init(const TCubeGeneralInfo*);
 	TMapWire();
 
+	static f32 mMoveTimerSpeed;
+	static f32 mDownRateMax;
+	static f32 mEndRate;
+	static f32 mStretchRate;
+	static f32 mHeightRate;
+	static f32 mReleaseHeight;
+	static f32 mFootLength;
 	static f32 mDrawWidth;
 	static f32 mDrawHeight;
 

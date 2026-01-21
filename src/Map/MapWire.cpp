@@ -3,6 +3,16 @@
 
 TMapWirePoint::TMapWirePoint() { }
 
+f32 TMapWire::mMoveTimerSpeed = 0.03f;
+f32 TMapWire::mDownRateMax    = 0.003f;
+f32 TMapWire::mEndRate        = 0.001f;
+f32 TMapWire::mStretchRate    = 2.0f;
+f32 TMapWire::mHeightRate     = 1.3f;
+f32 TMapWire::mReleaseHeight  = 100.0f;
+f32 TMapWire::mFootLength     = 26.0f;
+f32 TMapWire::mDrawWidth      = 5.0f;
+f32 TMapWire::mDrawHeight     = 6.0f;
+
 void TMapWire::drawLower() const { }
 
 void TMapWire::drawUpper() const { }
