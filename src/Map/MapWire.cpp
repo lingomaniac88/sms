@@ -23,7 +23,16 @@ void TMapWire::drawLower() const { }
 
 void TMapWire::drawUpper() const { }
 
-void TMapWire::getPointPowerAtReleased(f32) const { }
+f32 TMapWire::getPointPowerAtReleased(f32 param_1) const
+{
+	f32 fVar1;
+	if (param_1 >= unk4C) {
+		fVar1 = (param_1 - unk4C) / (1.0f - unk4C);
+	} else {
+		fVar1 = 1.0f - param_1 / unk4C;
+	}
+	return 1.0f - fVar1 * fVar1;
+}
 
 void TMapWire::getPointPosAtReleased(f32, JGeometry::TVec3<f32>*) const { }
 

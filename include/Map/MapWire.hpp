@@ -21,7 +21,7 @@ class TMapWire {
 public:
 	void drawLower() const;
 	void drawUpper() const;
-	void getPointPowerAtReleased(f32) const;
+	f32 getPointPowerAtReleased(f32) const;
 	void getPointPosAtReleased(f32, JGeometry::TVec3<f32>*) const;
 	void updatePointAtReleased(int);
 	void updateMovePointAtReleased();
