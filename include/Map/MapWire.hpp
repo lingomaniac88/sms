@@ -50,6 +50,7 @@ public:
 	static f32 mDrawWidth;
 	static f32 mDrawHeight;
 
+	// fabricated
 	const JGeometry::TVec3<f32>& getUnk00() const { return unk00; }
 	const JGeometry::TVec3<f32>& getUnk0C() const { return unk0C; }
 
