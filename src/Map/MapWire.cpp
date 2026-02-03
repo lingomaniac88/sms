@@ -1,7 +1,13 @@
 #include <types.h>
 #include <Map/MapWire.hpp>
 
-TMapWirePoint::TMapWirePoint() { }
+TMapWirePoint::TMapWirePoint()
+{
+	unk18 = 0.0f;
+	unk20 = 0.0f;
+	unk00.zero();
+	unk0C.zero();
+}
 
 f32 TMapWire::mMoveTimerSpeed = 0.03f;
 f32 TMapWire::mDownRateMax    = 0.003f;

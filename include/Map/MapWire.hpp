@@ -8,6 +8,13 @@ class TCubeGeneralInfo;
 class TMapWirePoint {
 public:
 	TMapWirePoint();
+
+public:
+	JGeometry::TVec3<f32> unk00;
+	JGeometry::TVec3<f32> unk0C;
+	f32 unk18;
+	f32 unk1C;
+	f32 unk20;
 };
 
 class TMapWire {
