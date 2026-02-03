@@ -44,7 +44,23 @@ void TMapWire::initPointAtJustReleased(f32, TMapWirePoint*) { }
 
 void TMapWire::release() { }
 
-void TMapWire::getPointPosAtHanged(f32, JGeometry::TVec3<f32>*) const { }
+void TMapWire::getPointPosAtHanged(f32 param_1,
+                                   JGeometry::TVec3<f32>* out) const
+{
+	f32 fVar1 = param_1 - unk4C;
+
+	out->x = unk18.x * fVar1 + unk50;
+	out->z = unk18.z * fVar1 + unk58;
+
+	if (param_1 <= unk74) {
+		out->y = unk54 + ((unk00.y - unk54) * (unk74 - param_1)) / unk74;
+	} else if (param_1 >= unk78) {
+		out->y
+		    = unk54 + ((unk0C.y - unk54) * (param_1 - unk78)) / (1.0f - unk78);
+	} else {
+		out->y = unk54;
+	}
+}
 
 void TMapWire::getPointInfoAtHanged(f32, TMapWirePoint*) { }
 
