@@ -1,5 +1,9 @@
 #include <types.h>
+
 #include <Map/MapWire.hpp>
+
+#include <JSystem/JMath.hpp>
+#include <MarioUtil/MathUtil.hpp>
 
 TMapWirePoint::TMapWirePoint()
 {
@@ -66,36 +70,146 @@ void TMapWire::getPointInfoAtHanged(f32, TMapWirePoint*) { }
 
 void TMapWire::setFootPointsAtHanged(MtxPtr) { }
 
-void TMapWire::calcViewAndDBEntry() { }
+void TMapWire::calcViewAndDBEntry()
+{
+	// TODO: Once we figure out what these are, replace void** with proper types
+	typedef void (*FuncType)();
 
-void TMapWire::move() { }
+	FuncType* pFunc = (FuncType*)((u32)*unk3C + 0x14);
+	(*pFunc)();
 
-f32 TMapWire::getPosInWire(const JGeometry::TVec3<f32>&) const { }
+	pFunc = (FuncType*)((u32)*unk40 + 0x14);
+	(*pFunc)();
+}
+
+void TMapWire::move()
+{
+	u8 padding[0x68];
+
+	bool bVar4;
+
+	if (unk7C != 2) {
+		return;
+	}
+
+	unk60 -= unk68;
+
+	if (unk60 < TMapWire::mEndRate) {
+		bVar4 = true;
+	} else {
+		unk5C += TMapWire::mMoveTimerSpeed;
+		if (unk5C >= 2.0f) {
+			unk5C -= 2.0f;
+		}
+		bVar4 = false;
+
+		unk54 = unk64 * JMASCos(unk5C * 32768.0f) * unk60;
+	}
+
+	if (bVar4) {
+		TMapWirePoint* mapWirePoint;
+
+		for (int idx = 0; idx < unk44; idx++) {
+			mapWirePoint = &mMapWirePoints[idx];
+
+			mapWirePoint->unk00 = mapWirePoint->unk0C;
+			mapWirePoint->unk18 = mapWirePoint->unk1C;
+		}
+
+		unk7C = 0;
+	} else {
+		TMapWirePoint* mapWirePoint;
+
+		for (int idx = 0; idx < unk44; idx++) {
+			mapWirePoint = &mMapWirePoints[idx];
+
+			f32 dVar10 = mapWirePoint->unk1C;
+			if (fabsf(dVar10 - mapWirePoint->unk18)
+			    > fabsf(mapWirePoint->unk20)) {
+				dVar10 = mapWirePoint->unk18 + mapWirePoint->unk20;
+			}
+
+			JGeometry::TVec3<f32> local64;
+			local64.scaleAdd(dVar10, unk00, unk18);
+
+			JGeometry::TVec3<f32> local70;
+			local70.set(dVar10 * unk18.x + unk00.x,
+			            -(unk38 * JMASSin((u32)(dVar10 * 32768.0f))
+			              - dVar10 * unk18.y + unk00.y),
+			            dVar10 * unk18.z + unk00.z);
+
+			f32 fVar2 = unk60;
+			f32 fVar3 = unk68;
+
+			mapWirePoint->unk00.x = local64.x;
+			mapWirePoint->unk00.y = getPointPowerAtReleased(dVar10) * fVar3
+			                        + (1.0f - fVar2) * (local70.y - local64.y)
+			                        + local64.y;
+			mapWirePoint->unk00.z = local64.z;
+		}
+	}
+}
+
+f32 TMapWire::getPosInWire(const JGeometry::TVec3<f32>& param_1) const
+{
+	JGeometry::TVec3<f32> vecA = unk00;
+	JGeometry::TVec3<f32> vecB = unk0C;
+	vecA.y                     = 0.0f;
+	vecB.y                     = 0.0f;
+
+	JGeometry::TVec3<f32> vecD = MsPerpendicFootToLineR(vecA, vecB, param_1);
+
+	f32 totalLength   = (vecA - vecB).length();
+	f32 partialLength = (vecD - vecA).length();
+	return partialLength / totalLength;
+}
 
 void TMapWire::getPointPosOnLine(f32, JGeometry::TVec3<f32>*) const { }
 
-void TMapWire::getPointPosOnWire(f32, JGeometry::TVec3<f32>*) const { }
+void TMapWire::getPointPosOnWire(f32 param_1, JGeometry::TVec3<f32>* out) const
+{
+	if (param_1 < 0.0f) {
+		param_1 = 0.0f;
+	} else if (param_1 > 1.0f) {
+		param_1 = 1.0f;
+	}
+
+	if (unk7C == 1) {
+		getPointPosAtHanged(param_1, out);
+	} else {
+		f32 fVar6 = unk18.y * param_1 + unk00.y;
+		f32 fVar4 = unk38;
+		f32 fVar5 = JMASSin(param_1 * 32768.0f);
+
+		out->x = unk18.x * param_1 + unk00.x;
+		out->y = getPointPowerAtReleased(param_1) * unk54
+		         + (1.0f - unk60) * (-(fVar4 * fVar5 - fVar6) - fVar6) + fVar6;
+		out->z = unk18.z * param_1 + unk00.z;
+	}
+}
 
 void TMapWire::getPointPosDefault(f32, JGeometry::TVec3<f32>*) const { }
 
 void TMapWire::initTipPoints(const TCubeGeneralInfo*) { }
 
-void TMapWire::init(const TCubeGeneralInfo*) { }
+void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
+{
+}
 
 TMapWire::TMapWire()
 {
-	unk34 = 0.0f;
-	unk38 = 0.0f;
-	unk44 = 0;
-	unk46 = 0;
-	unk48 = 0;
-	unk4C = 0.0f;
-	unk5C = 0.0f;
-	unk60 = 0.0f;
-	unk64 = 0.0f;
-	unk74 = 0.0f;
-	unk78 = 0.0f;
-	unk7C = 0;
+	unk34          = 0.0f;
+	unk38          = 0.0f;
+	unk44          = 0;
+	unk46          = 0;
+	mMapWirePoints = nullptr;
+	unk4C          = 0.0f;
+	unk5C          = 0.0f;
+	unk60          = 0.0f;
+	unk64          = 0.0f;
+	unk74          = 0.0f;
+	unk78          = 0.0f;
+	unk7C          = 0;
 	unk00.zero();
 	unk0C.zero();
 	unk18.zero();

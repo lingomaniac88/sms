@@ -68,7 +68,7 @@ public:
 	/* 0x40 */ void** unk40; // Unknown type for now
 	/* 0x44 */ u16 unk44;
 	/* 0x46 */ u16 unk46;
-	/* 0x48 */ u32 unk48;
+	/* 0x48 */ TMapWirePoint* mMapWirePoints;
 	/* 0x4C */ f32 unk4C;
 	/* 0x50 */ f32 unk50; // maybe a TVec3 with unk54 and unk58?
 	/* 0x54 */ f32 unk54;
@@ -81,7 +81,7 @@ public:
 	/* 0x70 */ f32 unk70;
 	/* 0x74 */ f32 unk74;
 	/* 0x78 */ f32 unk78;
-	/* 0x7C */ u16 unk7C;
+	/* 0x7C */ u16 unk7C; // Probably an enum?
 };
 
 #endif
