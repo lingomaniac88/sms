@@ -53,16 +53,16 @@ public:
 	static f32 mDrawHeight;
 
 	// fabricated
-	const JGeometry::TVec3<f32>& getUnk00() const { return unk00; }
-	const JGeometry::TVec3<f32>& getUnk0C() const { return unk0C; }
+	const JGeometry::TVec3<f32>& getStartPoint() const { return mStartPoint; }
+	const JGeometry::TVec3<f32>& getEndPoint() const { return mEndPoint; }
 
 	// very fake
 	void getPointPosAtHangedInlined(f32, JGeometry::TVec3<f32>*) const;
 
 public:
-	/* 0x00 */ JGeometry::TVec3<f32> unk00; // start point???
-	/* 0x0C */ JGeometry::TVec3<f32> unk0C; // end point???
-	/* 0x18 */ JGeometry::TVec3<f32> unk18;
+	/* 0x00 */ JGeometry::TVec3<f32> mStartPoint;
+	/* 0x0C */ JGeometry::TVec3<f32> mEndPoint;
+	/* 0x18 */ JGeometry::TVec3<f32> mDir;
 	/* 0x24 */ f32 unk24;
 	/* 0x28 */ f32 unk28;
 	/* 0x2C */ f32 unk2C;
@@ -71,8 +71,8 @@ public:
 	/* 0x38 */ f32 unk38;
 	/* 0x3C */ J3DModel* unk3C;
 	/* 0x40 */ J3DModel* unk40;
-	/* 0x44 */ u16 unk44;
-	/* 0x46 */ u16 unk46;
+	/* 0x44 */ u16 mNumActiveMapWirePoints;
+	/* 0x46 */ u16 mNumMapWirePoints;
 	/* 0x48 */ TMapWirePoint* mMapWirePoints;
 	/* 0x4C */ f32 unk4C;
 	/* 0x50 */ JGeometry::TVec3<f32> unk50;

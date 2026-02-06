@@ -67,14 +67,14 @@ TMapWire::getPointPosAtHangedInlined(f32 param_1,
 {
 	f32 fVar1 = param_1 - unk4C;
 
-	out->x = unk18.x * fVar1 + unk50.x;
-	out->z = unk18.z * fVar1 + unk50.z;
+	out->x = mDir.x * fVar1 + unk50.x;
+	out->z = mDir.z * fVar1 + unk50.z;
 
 	if (param_1 <= unk74) {
-		out->y = unk50.y + ((unk00.y - unk50.y) * (unk74 - param_1)) / unk74;
+		out->y = unk50.y + ((mStartPoint.y - unk50.y) * (unk74 - param_1)) / unk74;
 	} else if (param_1 >= unk78) {
 		out->y = unk50.y
-		         + ((unk0C.y - unk50.y) * (param_1 - unk78)) / (1.0f - unk78);
+		         + ((mEndPoint.y - unk50.y) * (param_1 - unk78)) / (1.0f - unk78);
 	} else {
 		out->y = unk50.y;
 	}
@@ -91,7 +91,7 @@ void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 	unk74 = unk4C - mFootLength / unk30;
 	unk78 = unk4C + mFootLength / unk30;
 
-	unk44 = 2;
+	mNumActiveMapWirePoints = 2;
 
 	if (mFootLength < unk4C * unk30) {
 		mMapWirePoints[0].unk18 = unk74;
@@ -147,7 +147,7 @@ void TMapWire::move()
 	if (bVar4) {
 		TMapWirePoint* mapWirePoint;
 
-		for (int idx = 0; idx < unk44; idx++) {
+		for (int idx = 0; idx < mNumActiveMapWirePoints; idx++) {
 			mapWirePoint = &mMapWirePoints[idx];
 
 			mapWirePoint->unk00 = mapWirePoint->unk0C;
@@ -158,7 +158,7 @@ void TMapWire::move()
 	} else {
 		TMapWirePoint* mapWirePoint;
 
-		for (int idx = 0; idx < unk44; idx++) {
+		for (int idx = 0; idx < mNumActiveMapWirePoints; idx++) {
 			mapWirePoint = &mMapWirePoints[idx];
 
 			f32 dVar10 = mapWirePoint->unk1C;
@@ -168,13 +168,13 @@ void TMapWire::move()
 			}
 
 			JGeometry::TVec3<f32> local64;
-			local64.scaleAdd(dVar10, unk00, unk18);
+			local64.scaleAdd(dVar10, mStartPoint, mDir);
 
 			JGeometry::TVec3<f32> local70;
-			local70.set(dVar10 * unk18.x + unk00.x,
+			local70.set(dVar10 * mDir.x + mStartPoint.x,
 			            -(unk38 * JMASSin((u32)(dVar10 * 32768.0f))
-			              - dVar10 * unk18.y + unk00.y),
-			            dVar10 * unk18.z + unk00.z);
+			              - dVar10 * mDir.y + mStartPoint.y),
+			            dVar10 * mDir.z + mStartPoint.z);
 
 			f32 fVar2 = unk60;
 			f32 fVar3 = unk68;
@@ -190,8 +190,8 @@ void TMapWire::move()
 
 f32 TMapWire::getPosInWire(const JGeometry::TVec3<f32>& param_1) const
 {
-	JGeometry::TVec3<f32> vecA = unk00;
-	JGeometry::TVec3<f32> vecB = unk0C;
+	JGeometry::TVec3<f32> vecA = mStartPoint;
+	JGeometry::TVec3<f32> vecB = mEndPoint;
 	vecA.y                     = 0.0f;
 	vecB.y                     = 0.0f;
 
@@ -215,14 +215,14 @@ void TMapWire::getPointPosOnWire(f32 param_1, JGeometry::TVec3<f32>* out) const
 	if (unk7C == 1) {
 		getPointPosAtHangedInlined(param_1, out);
 	} else {
-		f32 fVar6 = unk18.y * param_1 + unk00.y;
+		f32 fVar6 = mDir.y * param_1 + mStartPoint.y;
 		f32 fVar4 = unk38;
 		f32 fVar5 = JMASSin(param_1 * 32768.0f);
 
-		out->x = unk18.x * param_1 + unk00.x;
+		out->x = mDir.x * param_1 + mStartPoint.x;
 		out->y = getPointPowerAtReleased(param_1) * unk50.y
 		         + (1.0f - unk60) * (-(fVar4 * fVar5 - fVar6) - fVar6) + fVar6;
-		out->z = unk18.z * param_1 + unk00.z;
+		out->z = mDir.z * param_1 + mStartPoint.z;
 	}
 }
 
@@ -233,10 +233,10 @@ void TMapWire::initTipPoints(const TCubeGeneralInfo*) { }
 void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 {
 	s32 iVar9 = (s32)((cubeInfo->getUnk24().z / 50.0f + 1.0f) - 2.0f);
-	unk46     = iVar9;
-	unk44     = unk46;
+	mNumMapWirePoints     = iVar9;
+	mNumActiveMapWirePoints     = mNumMapWirePoints;
 
-	mMapWirePoints = new TMapWirePoint[unk46];
+	mMapWirePoints = new TMapWirePoint[mNumMapWirePoints];
 
 	unk30 = cubeInfo->getUnk24().z;
 
@@ -254,41 +254,41 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 	// TODO: What the heck is going on with these inlines?!
 	TMtx33f::multiplyInPlaceNest2(local_b8, &local_c4);
 
-	unk00.x = cubeInfo->getUnkC().x - local_c4.x;
-	unk00.y = cubeInfo->getUnkC().y - local_c4.y + cubeInfo->getUnk24().y;
-	unk00.z = cubeInfo->getUnkC().z - local_c4.z;
+	mStartPoint.x = cubeInfo->getUnkC().x - local_c4.x;
+	mStartPoint.y = cubeInfo->getUnkC().y - local_c4.y + cubeInfo->getUnk24().y;
+	mStartPoint.z = cubeInfo->getUnkC().z - local_c4.z;
 
-	unk0C.x = local_c4.x + cubeInfo->getUnkC().x;
-	unk0C.y = local_c4.y + cubeInfo->getUnkC().y + cubeInfo->getUnk24().y;
-	unk0C.z = local_c4.z + cubeInfo->getUnkC().z;
+	mEndPoint.x = local_c4.x + cubeInfo->getUnkC().x;
+	mEndPoint.y = local_c4.y + cubeInfo->getUnkC().y + cubeInfo->getUnk24().y;
+	mEndPoint.z = local_c4.z + cubeInfo->getUnkC().z;
 
-	unk18 = unk0C - unk00;
+	mDir = mEndPoint - mStartPoint;
 
 	unk38 = cubeInfo->getUnk24().y * 0.5f;
 
-	for (int i = 0; i < unk46; i++) {
+	for (int i = 0; i < mNumMapWirePoints; i++) {
 		TMapWirePoint& point = mMapWirePoints[i];
 
-		f32 fVar15  = (f32)(i + 1) / (f32)(unk46);
+		f32 fVar15  = (f32)(i + 1) / (f32)(mNumMapWirePoints);
 		point.unk18 = point.unk1C = fVar15;
 
-		point.unk0C.x = unk18.x * point.unk18 + unk00.x;
-		point.unk0C.y = unk18.y * point.unk18 + unk00.y
+		point.unk0C.x = mDir.x * point.unk18 + mStartPoint.x;
+		point.unk0C.y = mDir.y * point.unk18 + mStartPoint.y
 		                - unk38 * JMASSin(point.unk18 * 32768.0f);
-		point.unk0C.z = unk18.z * point.unk18 + unk00.z;
+		point.unk0C.z = mDir.z * point.unk18 + mStartPoint.z;
 
 		point.unk00 = point.unk0C;
 		point.unk18 = point.unk1C;
 	}
 
-	if (unk0C.x != unk00.x) {
-		f32 angle = atanf((unk0C.z - unk00.z) / (unk0C.x - unk00.x));
+	if (mEndPoint.x != mStartPoint.x) {
+		f32 angle = atanf((mEndPoint.z - mStartPoint.z) / (mEndPoint.x - mStartPoint.x));
 		unk34     = -angle * 180.0f / M_PI + 90.0f;
 	} else {
 		unk34 = 0.0f;
 	}
 
-	unk6C.set(unk0C.x - unk00.x, unk0C.z - unk00.z);
+	unk6C.set(mEndPoint.x - mStartPoint.x, mEndPoint.z - mStartPoint.z);
 	unk6C.normalize();
 	unk6C.rotate(M_PI / 2);
 
@@ -297,12 +297,12 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 
 	Mtx mtx;
 
-	MsMtxSetXYZRPH(mtx, unk00.x, unk00.y, unk00.z, cubeInfo->getUnk18().x,
+	MsMtxSetXYZRPH(mtx, mStartPoint.x, mStartPoint.y, mStartPoint.z, cubeInfo->getUnk18().x,
 	               cubeInfo->getUnk18().y, cubeInfo->getUnk18().z);
 	unk3C->setBaseTRMtx(mtx);
 	unk3C->calc();
 
-	MsMtxSetXYZRPH(mtx, unk0C.x, unk0C.y, unk0C.z, cubeInfo->getUnk18().x,
+	MsMtxSetXYZRPH(mtx, mEndPoint.x, mEndPoint.y, mEndPoint.z, cubeInfo->getUnk18().x,
 	               cubeInfo->getUnk18().y + 180.0f, cubeInfo->getUnk18().z);
 	unk40->setBaseTRMtx(mtx);
 	unk40->calc();
@@ -325,8 +325,8 @@ TMapWire::TMapWire()
 {
 	unk34          = 0.0f;
 	unk38          = 0.0f;
-	unk44          = 0;
-	unk46          = 0;
+	mNumActiveMapWirePoints          = 0;
+	mNumMapWirePoints          = 0;
 	mMapWirePoints = nullptr;
 	unk4C          = 0.0f;
 	unk5C          = 0.0f;
@@ -335,9 +335,9 @@ TMapWire::TMapWire()
 	unk74          = 0.0f;
 	unk78          = 0.0f;
 	unk7C          = 0;
-	unk00.zero();
-	unk0C.zero();
-	unk18.zero();
+	mStartPoint.zero();
+	mEndPoint.zero();
+	mDir.zero();
 	unk6C.zero();
 	unk50.zero();
 	unk3C = nullptr;
