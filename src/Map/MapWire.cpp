@@ -192,29 +192,6 @@ void TMapWire::getPointPosDefault(f32, JGeometry::TVec3<f32>*) const { }
 
 void TMapWire::initTipPoints(const TCubeGeneralInfo*) { }
 
-// Definitely fake
-static void set1(JGeometry::TVec3<f32>& local_c4, const TMtx33f& local_b8)
-{
-	local_c4.set(local_b8.at(0, 0) * local_c4.x + local_b8.at(0, 1) * local_c4.y
-	                 + local_b8.at(0, 2) * local_c4.z,
-	             local_b8.at(1, 0) * local_c4.x + local_b8.at(1, 1) * local_c4.y
-	                 + local_b8.at(1, 2) * local_c4.z,
-	             local_b8.at(2, 0) * local_c4.x + local_b8.at(2, 1) * local_c4.y
-	                 + local_b8.at(2, 2) * local_c4.z);
-}
-
-// Definitely fake
-static void set2(JGeometry::TVec3<f32>& local_c4, const TMtx33f& local_b8)
-{
-	set1(local_c4, local_b8);
-}
-
-// Definitely fake
-static void set3(JGeometry::TVec3<f32>& local_c4, const TMtx33f& local_b8)
-{
-	set2(local_c4, local_b8);
-}
-
 void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 {
 	s32 iVar9 = (s32)((cubeInfo->getUnk24().z / 50.0f + 1.0f) - 2.0f);
@@ -237,7 +214,7 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 	                  (s16)(cubeInfo->getUnk18().z / 180.0f * 32768.0f));
 
 	// TODO: What the heck is going on with these inlines?!
-	set3(local_c4, local_b8);
+	TMtx33f::multiplyInPlaceNest2(local_b8, &local_c4);
 
 	unk00.x = cubeInfo->getUnkC().x - local_c4.x;
 	unk00.y = cubeInfo->getUnkC().y - local_c4.y + cubeInfo->getUnk24().y;
