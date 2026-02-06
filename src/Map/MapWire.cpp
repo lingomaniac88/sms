@@ -74,7 +74,37 @@ void TMapWire::getPointPosAtHanged(f32 param_1,
 
 void TMapWire::getPointInfoAtHanged(f32, TMapWirePoint*) { }
 
-void TMapWire::setFootPointsAtHanged(MtxPtr) { }
+void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
+{
+	unk7C = 1;
+	unk50.set(mtx[0][3], mtx[1][3], mtx[2][3]); // translate portion of matrix
+	unk4C = getPosInWire(unk50);
+
+	unk74 = unk4C - mFootLength / unk30;
+	unk78 = unk4C + mFootLength / unk30;
+
+	unk44 = 2;
+
+	if (mFootLength < unk4C * unk30) {
+		mMapWirePoints[0].unk18 = unk74;
+		JGeometry::TVec3<f32> out;
+		getPointPosAtHanged(unk74, &out);
+		mMapWirePoints[0].unk00.set(out);
+	} else {
+		mMapWirePoints[0].unk18 = unk4C;
+		mMapWirePoints[0].unk00.set(unk50);
+	}
+
+	if (mFootLength < (1.0f - unk4C) * unk30) {
+		mMapWirePoints[1].unk18 = unk78;
+		JGeometry::TVec3<f32> out;
+		getPointPosAtHanged(unk78, &out);
+		mMapWirePoints[1].unk00.set(out);
+	} else {
+		mMapWirePoints[1].unk18 = unk4C;
+		mMapWirePoints[1].unk00.set(unk50);
+	}
+}
 
 void TMapWire::calcViewAndDBEntry()
 {
