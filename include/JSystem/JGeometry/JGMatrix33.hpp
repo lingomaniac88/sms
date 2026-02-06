@@ -2,6 +2,7 @@
 #define JG_MATRIX33_HPP
 
 #include <dolphin/types.h>
+#include <JSystem/JGeometry/JGVec3.hpp>
 
 namespace JGeometry {
 
