@@ -107,7 +107,19 @@ public:
 
 	void assign(size_t, const T&) { }
 
-	void resize(size_t new_size, const T& value = T()) { }
+	void resize(size_t new_size, const T& value = T())
+	{
+		size_t sz = size();
+		if (new_size > sz) {
+			// TODO: one more inline here?
+			iterator it = end();
+			if (new_size - sz > 0)
+				insert(it, new_size - sz, value);
+		} else if (new_size != size()) {
+			// TODO: one more inline here too???
+			erase(pBegin_ + new_size, pEnd_);
+		}
+	}
 
 	void reserve(size_t new_capacity)
 	{
