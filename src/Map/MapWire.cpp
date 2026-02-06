@@ -65,8 +65,8 @@ void TMapWire::getPointPosAtHanged(f32 param_1,
 	if (param_1 <= unk74) {
 		out->y = unk50.y + ((unk00.y - unk50.y) * (unk74 - param_1)) / unk74;
 	} else if (param_1 >= unk78) {
-		out->y
-		    = unk50.y + ((unk0C.y - unk50.y) * (param_1 - unk78)) / (1.0f - unk78);
+		out->y = unk50.y
+		         + ((unk0C.y - unk50.y) * (param_1 - unk78)) / (1.0f - unk78);
 	} else {
 		out->y = unk50.y;
 	}
@@ -235,7 +235,8 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 		point.unk18 = point.unk1C = fVar15;
 
 		point.unk0C.x = unk18.x * point.unk18 + unk00.x;
-		point.unk0C.y = unk18.y * point.unk18 + unk00.y - unk38 * JMASSin(point.unk18 * 32768.0f);
+		point.unk0C.y = unk18.y * point.unk18 + unk00.y
+		                - unk38 * JMASSin(point.unk18 * 32768.0f);
 		point.unk0C.z = unk18.z * point.unk18 + unk00.z;
 
 		point.unk00 = point.unk0C;
@@ -244,7 +245,7 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 
 	if (unk0C.x != unk00.x) {
 		f32 angle = atanf((unk0C.z - unk00.z) / (unk0C.x - unk00.x));
-		unk34 = -angle * 180.0f / M_PI + 90.0f;
+		unk34     = -angle * 180.0f / M_PI + 90.0f;
 	} else {
 		unk34 = 0.0f;
 	}
@@ -263,7 +264,7 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 	unk3C->calc();
 
 	MsMtxSetXYZRPH(mtx, unk0C.x, unk0C.y, unk0C.z, unk18.x, unk18.y + 180.0f,
-	                unk18.z);
+	               unk18.z);
 	unk40->setBaseTRMtx(mtx);
 	unk40->calc();
 
