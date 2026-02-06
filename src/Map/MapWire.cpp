@@ -54,8 +54,16 @@ void TMapWire::initPointAtJustReleased(f32, TMapWirePoint*) { }
 
 void TMapWire::release() { }
 
-void TMapWire::getPointPosAtHanged(f32 param_1,
-                                   JGeometry::TVec3<f32>* out) const
+#pragma dont_inline on
+void TMapWire::getPointPosAtHanged(f32 param_1, JGeometry::TVec3<f32>* out) const
+{
+	getPointPosAtHangedInlined(param_1, out);
+}
+#pragma dont_inline off
+
+inline void
+TMapWire::getPointPosAtHangedInlined(f32 param_1,
+                                     JGeometry::TVec3<f32>* out) const
 {
 	f32 fVar1 = param_1 - unk4C;
 
@@ -205,7 +213,7 @@ void TMapWire::getPointPosOnWire(f32 param_1, JGeometry::TVec3<f32>* out) const
 	}
 
 	if (unk7C == 1) {
-		getPointPosAtHanged(param_1, out);
+		getPointPosAtHangedInlined(param_1, out);
 	} else {
 		f32 fVar6 = unk18.y * param_1 + unk00.y;
 		f32 fVar4 = unk38;
