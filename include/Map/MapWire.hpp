@@ -72,9 +72,7 @@ public:
 	/* 0x46 */ u16 unk46;
 	/* 0x48 */ TMapWirePoint* mMapWirePoints;
 	/* 0x4C */ f32 unk4C;
-	/* 0x50 */ f32 unk50; // maybe a TVec3 with unk54 and unk58?
-	/* 0x54 */ f32 unk54;
-	/* 0x58 */ f32 unk58;
+	/* 0x50 */ JGeometry::TVec3<f32> unk50;
 	/* 0x5C */ f32 unk5C;
 	/* 0x60 */ f32 unk60;
 	/* 0x64 */ f32 unk64;

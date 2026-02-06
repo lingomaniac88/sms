@@ -59,16 +59,16 @@ void TMapWire::getPointPosAtHanged(f32 param_1,
 {
 	f32 fVar1 = param_1 - unk4C;
 
-	out->x = unk18.x * fVar1 + unk50;
-	out->z = unk18.z * fVar1 + unk58;
+	out->x = unk18.x * fVar1 + unk50.x;
+	out->z = unk18.z * fVar1 + unk50.z;
 
 	if (param_1 <= unk74) {
-		out->y = unk54 + ((unk00.y - unk54) * (unk74 - param_1)) / unk74;
+		out->y = unk50.y + ((unk00.y - unk50.y) * (unk74 - param_1)) / unk74;
 	} else if (param_1 >= unk78) {
 		out->y
-		    = unk54 + ((unk0C.y - unk54) * (param_1 - unk78)) / (1.0f - unk78);
+		    = unk50.y + ((unk0C.y - unk50.y) * (param_1 - unk78)) / (1.0f - unk78);
 	} else {
-		out->y = unk54;
+		out->y = unk50.y;
 	}
 }
 
@@ -103,7 +103,7 @@ void TMapWire::move()
 		}
 		bVar4 = false;
 
-		unk54 = unk64 * JMASCos(unk5C * 32768.0f) * unk60;
+		unk50.y = unk64 * JMASCos(unk5C * 32768.0f) * unk60;
 	}
 
 	if (bVar4) {
@@ -182,7 +182,7 @@ void TMapWire::getPointPosOnWire(f32 param_1, JGeometry::TVec3<f32>* out) const
 		f32 fVar5 = JMASSin(param_1 * 32768.0f);
 
 		out->x = unk18.x * param_1 + unk00.x;
-		out->y = getPointPowerAtReleased(param_1) * unk54
+		out->y = getPointPowerAtReleased(param_1) * unk50.y
 		         + (1.0f - unk60) * (-(fVar4 * fVar5 - fVar6) - fVar6) + fVar6;
 		out->z = unk18.z * param_1 + unk00.z;
 	}
@@ -299,9 +299,7 @@ TMapWire::TMapWire()
 	unk0C.zero();
 	unk18.zero();
 	unk6C.zero();
-	unk58 = 0.0f;
-	unk54 = 0.0f;
-	unk50 = 0.0f;
+	unk50.zero();
 	unk3C = nullptr;
 	unk40 = nullptr;
 }
