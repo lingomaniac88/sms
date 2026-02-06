@@ -289,12 +289,12 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 
 	Mtx mtx;
 
-	MsMtxSetXYZRPH(mtx, unk00.x, unk00.y, unk00.z, unk18.x, unk18.y, unk18.z);
+	MsMtxSetXYZRPH(mtx, unk00.x, unk00.y, unk00.z, cubeInfo->getUnk18().x, cubeInfo->getUnk18().y, cubeInfo->getUnk18().z);
 	unk3C->setBaseTRMtx(mtx);
 	unk3C->calc();
 
-	MsMtxSetXYZRPH(mtx, unk0C.x, unk0C.y, unk0C.z, unk18.x, unk18.y + 180.0f,
-	               unk18.z);
+	MsMtxSetXYZRPH(mtx, unk0C.x, unk0C.y, unk0C.z, cubeInfo->getUnk18().x, cubeInfo->getUnk18().y + 180.0f,
+	               cubeInfo->getUnk18().z);
 	unk40->setBaseTRMtx(mtx);
 	unk40->calc();
 
