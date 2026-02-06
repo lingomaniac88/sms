@@ -1,9 +1,15 @@
+#include <dolphin/mtx.h>
+#include <fake_tgmath.h>
 #include <types.h>
 
 #include <Map/MapWire.hpp>
 
+#include <Camera/CubeMapTool.hpp>
 #include <JSystem/JMath.hpp>
+#include <Map/MapCollisionEntry.hpp>
 #include <MarioUtil/MathUtil.hpp>
+#include <MarioUtil/ModelUtil.hpp>
+#include <MoveBG/MapObjManager.hpp>
 
 TMapWirePoint::TMapWirePoint()
 {
@@ -72,14 +78,8 @@ void TMapWire::setFootPointsAtHanged(MtxPtr) { }
 
 void TMapWire::calcViewAndDBEntry()
 {
-	// TODO: Once we figure out what these are, replace void** with proper types
-	typedef void (*FuncType)();
-
-	FuncType* pFunc = (FuncType*)((u32)*unk3C + 0x14);
-	(*pFunc)();
-
-	pFunc = (FuncType*)((u32)*unk40 + 0x14);
-	(*pFunc)();
+	unk3C->viewCalc();
+	unk40->viewCalc();
 }
 
 void TMapWire::move()
@@ -192,8 +192,116 @@ void TMapWire::getPointPosDefault(f32, JGeometry::TVec3<f32>*) const { }
 
 void TMapWire::initTipPoints(const TCubeGeneralInfo*) { }
 
+// Definitely fake
+static void set1(JGeometry::TVec3<f32>& local_c4, const TMtx33f& local_b8)
+{
+	local_c4.set(local_b8.at(0, 0) * local_c4.x + local_b8.at(0, 1) * local_c4.y
+	                 + local_b8.at(0, 2) * local_c4.z,
+	             local_b8.at(1, 0) * local_c4.x + local_b8.at(1, 1) * local_c4.y
+	                 + local_b8.at(1, 2) * local_c4.z,
+	             local_b8.at(2, 0) * local_c4.x + local_b8.at(2, 1) * local_c4.y
+	                 + local_b8.at(2, 2) * local_c4.z);
+}
+
+// Definitely fake
+static void set2(JGeometry::TVec3<f32>& local_c4, const TMtx33f& local_b8)
+{
+	set1(local_c4, local_b8);
+}
+
+// Definitely fake
+static void set3(JGeometry::TVec3<f32>& local_c4, const TMtx33f& local_b8)
+{
+	set2(local_c4, local_b8);
+}
+
 void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 {
+	s32 iVar9 = (s32)((cubeInfo->getUnk24().z / 50.0f + 1.0f) - 2.0f);
+	unk46     = iVar9;
+	unk44     = unk46;
+
+	mMapWirePoints = new TMapWirePoint[unk46];
+
+	unk30 = cubeInfo->getUnk24().z;
+
+	JGeometry::TVec3<f32> local_c4(0.0f, 0.0f, unk30 * 0.5f);
+
+	JGeometry::TRotation3<TMtx33f> local_b8;
+	local_b8.ref(0, 2) = local_b8.ref(1, 2) = 0.0f;
+	local_b8.ref(0, 1) = local_b8.ref(2, 1) = 0.0f;
+	local_b8.ref(1, 0) = local_b8.ref(2, 0) = 0.0f;
+	local_b8.ref(0, 0) = local_b8.ref(1, 1) = local_b8.ref(2, 2) = 1.0f;
+	local_b8.setEular((s16)(cubeInfo->getUnk18().x / 180.0f * 32768.0f),
+	                  (s16)(cubeInfo->getUnk18().y / 180.0f * 32768.0f),
+	                  (s16)(cubeInfo->getUnk18().z / 180.0f * 32768.0f));
+
+	// TODO: What the heck is going on with these inlines?!
+	set3(local_c4, local_b8);
+
+	unk00.x = cubeInfo->getUnkC().x - local_c4.x;
+	unk00.y = cubeInfo->getUnkC().y - local_c4.y + cubeInfo->getUnk24().y;
+	unk00.z = cubeInfo->getUnkC().z - local_c4.z;
+
+	unk0C.x = local_c4.x + cubeInfo->getUnkC().x;
+	unk0C.y = local_c4.y + cubeInfo->getUnkC().y + cubeInfo->getUnk24().y;
+	unk0C.z = local_c4.z + cubeInfo->getUnkC().z;
+
+	unk18 = unk0C - unk00;
+
+	unk38 = cubeInfo->getUnk24().y * 0.5f;
+
+	for (int i = 0; i < unk46; i++) {
+		TMapWirePoint& point = mMapWirePoints[i];
+
+		f32 fVar15  = (f32)(i + 1) / (f32)(unk46);
+		point.unk18 = point.unk1C = fVar15;
+
+		point.unk0C.x = unk18.x * point.unk18 + unk00.x;
+		point.unk0C.y = unk18.y * point.unk18 + unk00.y - unk38 * JMASSin(point.unk18 * 32768.0f);
+		point.unk0C.z = unk18.z * point.unk18 + unk00.z;
+
+		point.unk00 = point.unk0C;
+		point.unk18 = point.unk1C;
+	}
+
+	if (unk0C.x != unk00.x) {
+		f32 angle = atanf((unk0C.z - unk00.z) / (unk0C.x - unk00.x));
+		unk34 = -angle * 180.0f / M_PI + 90.0f;
+	} else {
+		unk34 = 0.0f;
+	}
+
+	unk6C.set(unk0C.x - unk00.x, unk0C.z - unk00.z);
+	unk6C.normalize();
+	unk6C.rotate(M_PI / 2);
+
+	unk3C = SMS_CreatePartsModel("/common/map/WireFitting.bmd", 0x10210000);
+	unk40 = new J3DModel(unk3C->getModelData(), 0x10210000, 1);
+
+	Mtx mtx;
+
+	MsMtxSetXYZRPH(mtx, unk00.x, unk00.y, unk00.z, unk18.x, unk18.y, unk18.z);
+	unk3C->setBaseTRMtx(mtx);
+	unk3C->calc();
+
+	MsMtxSetXYZRPH(mtx, unk0C.x, unk0C.y, unk0C.z, unk18.x, unk18.y + 180.0f,
+	                unk18.z);
+	unk40->setBaseTRMtx(mtx);
+	unk40->calc();
+
+	gpMapObjManager->entryStaticDrawBufferSun(unk3C);
+	gpMapObjManager->entryStaticDrawBufferSun(unk40);
+
+	TMapCollisionStatic* collision1 = new TMapCollisionStatic;
+	collision1->init("/common/map/WireFitting.col", 2, nullptr);
+	MTXCopy(unk3C->getAnmMtx(0), collision1->unk20);
+	collision1->setUp();
+
+	TMapCollisionStatic* collision2 = new TMapCollisionStatic;
+	collision2->init("/common/map/WireFitting.col", 2, nullptr);
+	MTXCopy(unk40->getAnmMtx(0), collision2->unk20);
+	collision2->setUp();
 }
 
 TMapWire::TMapWire()
@@ -213,8 +321,7 @@ TMapWire::TMapWire()
 	unk00.zero();
 	unk0C.zero();
 	unk18.zero();
-	unk70 = 0.0f;
-	unk6C = 0.0f;
+	unk6C.zero();
 	unk58 = 0.0f;
 	unk54 = 0.0f;
 	unk50 = 0.0f;
