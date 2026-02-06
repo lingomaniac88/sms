@@ -84,7 +84,7 @@ void TMapWire::calcViewAndDBEntry()
 
 void TMapWire::move()
 {
-	u8 padding[0x68];
+	u8 padding[0x30];
 
 	bool bVar4;
 
