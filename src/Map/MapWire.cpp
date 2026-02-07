@@ -231,7 +231,24 @@ void TMapWire::getPointPosOnWire(f32 param_1, JGeometry::TVec3<f32>* out) const
 	}
 }
 
-void TMapWire::getPointPosDefault(f32, JGeometry::TVec3<f32>*) const { }
+/**
+ * @brief The "default" position of a point on this wire.
+ *
+ * @details
+ * This default position is determined by applying a sinusoidal "droop" to
+ * the "straight line" position.
+ *
+ * @param pos the relative position on the wire (0 to 1)
+ * @param out the output vector
+ */
+void TMapWire::getPointPosDefault(f32 pos, JGeometry::TVec3<f32>* out) const
+{
+	JGeometry::TVec3<f32> basePoint;
+	basePoint.scaleAdd(pos, mStartPoint, mDir);
+
+	out->set(basePoint.x, basePoint.y - unk38 * JMASSin(pos * 32768.0f),
+	         basePoint.z);
+}
 
 void TMapWire::initTipPoints(const TCubeGeneralInfo*) { }
 
