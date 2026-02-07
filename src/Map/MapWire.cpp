@@ -33,15 +33,17 @@ void TMapWire::drawLower() const { }
 
 void TMapWire::drawUpper() const { }
 
-f32 TMapWire::getPointPowerAtReleased(f32 param_1) const
+f32 TMapWire::getPointPowerAtReleased(f32 pos) const
 {
-	f32 fVar1;
-	if (param_1 >= unk4C) {
-		fVar1 = (param_1 - unk4C) / (1.0f - unk4C);
+	// 1 = default height, 0 = stretched all the way down
+	f32 relativeHeightAtPos;
+	if (pos >= unk4C) {
+		relativeHeightAtPos = (pos - unk4C) / (1.0f - unk4C);
 	} else {
-		fVar1 = 1.0f - param_1 / unk4C;
+		relativeHeightAtPos = 1.0f - pos / unk4C;
 	}
-	return 1.0f - fVar1 * fVar1;
+
+	return 1.0f - relativeHeightAtPos * relativeHeightAtPos;
 }
 
 void TMapWire::getPointPosAtReleased(f32, JGeometry::TVec3<f32>*) const { }
