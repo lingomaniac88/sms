@@ -207,7 +207,16 @@ f32 TMapWire::getPosInWire(const JGeometry::TVec3<f32>& param_1) const
 	return partialLength / totalLength;
 }
 
-void TMapWire::getPointPosOnLine(f32, JGeometry::TVec3<f32>*) const { }
+/**
+ * @brief Gets a position on the straight line connecting the wire's endpoints.
+ *
+ * @param pos the relative position on the wire (0 to 1)
+ * @param out the output vector
+ */
+void TMapWire::getPointPosOnLine(f32 pos, JGeometry::TVec3<f32>* out) const
+{
+	out->scaleAdd(pos, mStartPoint, mDir);
+}
 
 void TMapWire::getPointPosOnWire(f32 param_1, JGeometry::TVec3<f32>* out) const
 {
@@ -232,11 +241,8 @@ void TMapWire::getPointPosOnWire(f32 param_1, JGeometry::TVec3<f32>* out) const
 }
 
 /**
- * @brief The "default" position of a point on this wire.
- *
- * @details
- * This default position is determined by applying a sinusoidal "droop" to
- * the "straight line" position.
+ * @brief The "default" position of a point on this wire after accounting for
+ * its sag factor.
  *
  * @param pos the relative position on the wire (0 to 1)
  * @param out the output vector
@@ -244,7 +250,7 @@ void TMapWire::getPointPosOnWire(f32 param_1, JGeometry::TVec3<f32>* out) const
 void TMapWire::getPointPosDefault(f32 pos, JGeometry::TVec3<f32>* out) const
 {
 	JGeometry::TVec3<f32> basePoint;
-	basePoint.scaleAdd(pos, mStartPoint, mDir);
+	getPointPosOnLine(pos, &basePoint);
 
 	out->set(basePoint.x, basePoint.y - unk38 * JMASSin(pos * 32768.0f),
 	         basePoint.z);
