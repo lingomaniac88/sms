@@ -86,7 +86,6 @@ void TMapWire::initPointAtJustReleased(f32, TMapWirePoint*) { }
 
 void TMapWire::release() { }
 
-#pragma dont_inline on
 void TMapWire::getPointPosAtHanged(f32 param_1,
                                    JGeometry::TVec3<f32>* out) const
 {
