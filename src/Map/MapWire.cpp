@@ -68,7 +68,17 @@ void TMapWire::getPointPosAtReleased(f32 pos, JGeometry::TVec3<f32>* out) const
 	out->set(local_a4.x, yAdjust + local_a4.y, local_a4.z);
 }
 
-void TMapWire::updatePointAtReleased(int) { }
+void TMapWire::updatePointAtReleased(int index)
+{
+	TMapWirePoint* mapWirePoint = &mMapWirePoints[index];
+
+	f32 pos = mapWirePoint->unk1C;
+	if (fabsf(pos - mapWirePoint->unk18) > fabsf(mapWirePoint->unk20)) {
+		pos = mapWirePoint->unk18 + mapWirePoint->unk20;
+	}
+
+	getPointPosAtReleased(pos, &mapWirePoint->unk00);
+}
 
 void TMapWire::updateMovePointAtReleased() { }
 
@@ -139,8 +149,6 @@ void TMapWire::calcViewAndDBEntry()
 
 void TMapWire::move()
 {
-	u8 padding[0x30];
-
 	bool bVar4;
 
 	if (unk7C != 2) {
@@ -171,34 +179,8 @@ void TMapWire::move()
 
 		unk7C = 0;
 	} else {
-		TMapWirePoint* mapWirePoint;
-
 		for (int index = 0; index < mNumActiveMapWirePoints; index++) {
-			mapWirePoint = &mMapWirePoints[index];
-
-			f32 dVar10 = mapWirePoint->unk1C;
-			if (fabsf(dVar10 - mapWirePoint->unk18)
-			    > fabsf(mapWirePoint->unk20)) {
-				dVar10 = mapWirePoint->unk18 + mapWirePoint->unk20;
-			}
-
-			JGeometry::TVec3<f32> local64;
-			local64.scaleAdd(dVar10, mStartPoint, mDir);
-
-			JGeometry::TVec3<f32> local70;
-			local70.set(dVar10 * mDir.x + mStartPoint.x,
-			            -(unk38 * JMASSin((u32)(dVar10 * 32768.0f))
-			              - dVar10 * mDir.y + mStartPoint.y),
-			            dVar10 * mDir.z + mStartPoint.z);
-
-			f32 fVar2 = unk60;
-			f32 fVar3 = unk68;
-
-			mapWirePoint->unk00.x = local64.x;
-			mapWirePoint->unk00.y = getPointPowerAtReleased(dVar10) * fVar3
-			                        + (1.0f - fVar2) * (local70.y - local64.y)
-			                        + local64.y;
-			mapWirePoint->unk00.z = local64.z;
+			updatePointAtReleased(index);
 		}
 	}
 }
