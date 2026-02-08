@@ -56,9 +56,6 @@ public:
 	const JGeometry::TVec3<f32>& getStartPoint() const { return mStartPoint; }
 	const JGeometry::TVec3<f32>& getEndPoint() const { return mEndPoint; }
 
-	// very fake
-	void getPointPosAtHangedInlined(f32, JGeometry::TVec3<f32>*) const;
-
 public:
 	/* 0x00 */ JGeometry::TVec3<f32> mStartPoint;
 	/* 0x0C */ JGeometry::TVec3<f32> mEndPoint;

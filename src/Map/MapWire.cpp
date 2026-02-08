@@ -60,14 +60,6 @@ void TMapWire::release() { }
 void TMapWire::getPointPosAtHanged(f32 param_1,
                                    JGeometry::TVec3<f32>* out) const
 {
-	getPointPosAtHangedInlined(param_1, out);
-}
-#pragma dont_inline off
-
-inline void
-TMapWire::getPointPosAtHangedInlined(f32 param_1,
-                                     JGeometry::TVec3<f32>* out) const
-{
 	f32 fVar1 = param_1 - unk4C;
 
 	out->x = mDir.x * fVar1 + unk50.x;
@@ -85,7 +77,11 @@ TMapWire::getPointPosAtHangedInlined(f32 param_1,
 	}
 }
 
-void TMapWire::getPointInfoAtHanged(f32, TMapWirePoint*) { }
+// TODO: What the heck is this anyway?
+void TMapWire::getPointInfoAtHanged(f32 pos, TMapWirePoint* point)
+{
+	getPointPosAtHanged(pos, &point->unk00);
+}
 
 void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 {
@@ -100,9 +96,7 @@ void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 
 	if (mFootLength < unk4C * unk30) {
 		mMapWirePoints[0].unk18 = unk74;
-		JGeometry::TVec3<f32> out;
-		getPointPosAtHanged(unk74, &out);
-		mMapWirePoints[0].unk00.set(out);
+		getPointInfoAtHanged(unk74, &mMapWirePoints[0]);
 	} else {
 		mMapWirePoints[0].unk18 = unk4C;
 		mMapWirePoints[0].unk00.set(unk50);
@@ -110,9 +104,7 @@ void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 
 	if (mFootLength < (1.0f - unk4C) * unk30) {
 		mMapWirePoints[1].unk18 = unk78;
-		JGeometry::TVec3<f32> out;
-		getPointPosAtHanged(unk78, &out);
-		mMapWirePoints[1].unk00.set(out);
+		getPointInfoAtHanged(unk78, &mMapWirePoints[1]);
 	} else {
 		mMapWirePoints[1].unk18 = unk4C;
 		mMapWirePoints[1].unk00.set(unk50);
@@ -227,7 +219,7 @@ void TMapWire::getPointPosOnWire(f32 param_1, JGeometry::TVec3<f32>* out) const
 	}
 
 	if (unk7C == 1) {
-		getPointPosAtHangedInlined(param_1, out);
+		getPointPosAtHanged(param_1, out);
 	} else {
 		f32 fVar6 = mDir.y * param_1 + mStartPoint.y;
 		f32 fVar4 = unk38;
