@@ -19,6 +19,13 @@ TMapWirePoint::TMapWirePoint()
 	unk0C.zero();
 }
 
+// fabricated but convenient for now
+void TMapWirePoint::reset()
+{
+	unk00 = unk0C;
+	unk18 = unk1C;
+}
+
 f32 TMapWire::mMoveTimerSpeed = 0.03f;
 f32 TMapWire::mDownRateMax    = 0.003f;
 f32 TMapWire::mEndRate        = 0.001f;
@@ -144,19 +151,17 @@ void TMapWire::move()
 	if (bVar4) {
 		TMapWirePoint* mapWirePoint;
 
-		for (int idx = 0; idx < mNumActiveMapWirePoints; idx++) {
-			mapWirePoint = &mMapWirePoints[idx];
-
-			mapWirePoint->unk00 = mapWirePoint->unk0C;
-			mapWirePoint->unk18 = mapWirePoint->unk1C;
+		for (int index = 0; index < mNumActiveMapWirePoints; index++) {
+			mapWirePoint = &mMapWirePoints[index];
+			mapWirePoint->reset();
 		}
 
 		unk7C = 0;
 	} else {
 		TMapWirePoint* mapWirePoint;
 
-		for (int idx = 0; idx < mNumActiveMapWirePoints; idx++) {
-			mapWirePoint = &mMapWirePoints[idx];
+		for (int index = 0; index < mNumActiveMapWirePoints; index++) {
+			mapWirePoint = &mMapWirePoints[index];
 
 			f32 dVar10 = mapWirePoint->unk1C;
 			if (fabsf(dVar10 - mapWirePoint->unk18)

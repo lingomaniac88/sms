@@ -11,6 +11,9 @@ class TMapWirePoint {
 public:
 	TMapWirePoint();
 
+	// fabricated
+	void reset();
+
 public:
 	JGeometry::TVec3<f32> unk00;
 	JGeometry::TVec3<f32> unk0C;
