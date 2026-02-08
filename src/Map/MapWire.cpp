@@ -53,7 +53,17 @@ f32 TMapWire::getPointPowerAtReleased(f32 pos) const
 	return 1.0f - relativeHeightAtPos * relativeHeightAtPos;
 }
 
-void TMapWire::getPointPosAtReleased(f32, JGeometry::TVec3<f32>*) const { }
+void TMapWire::getPointPosAtReleased(f32 pos, JGeometry::TVec3<f32>* out) const
+{
+	f32 fVar6 = mDir.y * pos + mStartPoint.y;
+	f32 fVar4 = unk38;
+	f32 fVar5 = JMASSin(pos * 32768.0f);
+
+	out->x = mDir.x * pos + mStartPoint.x;
+	out->y = getPointPowerAtReleased(pos) * unk50.y
+				+ (1.0f - unk60) * (-(fVar4 * fVar5 - fVar6) - fVar6) + fVar6;
+	out->z = mDir.z * pos + mStartPoint.z;
+}
 
 void TMapWire::updatePointAtReleased(int) { }
 
@@ -226,14 +236,7 @@ void TMapWire::getPointPosOnWire(f32 param_1, JGeometry::TVec3<f32>* out) const
 	if (unk7C == 1) {
 		getPointPosAtHanged(param_1, out);
 	} else {
-		f32 fVar6 = mDir.y * param_1 + mStartPoint.y;
-		f32 fVar4 = unk38;
-		f32 fVar5 = JMASSin(param_1 * 32768.0f);
-
-		out->x = mDir.x * param_1 + mStartPoint.x;
-		out->y = getPointPowerAtReleased(param_1) * unk50.y
-		         + (1.0f - unk60) * (-(fVar4 * fVar5 - fVar6) - fVar6) + fVar6;
-		out->z = mDir.z * param_1 + mStartPoint.z;
+		getPointPosAtReleased(param_1, out);
 	}
 }
 
