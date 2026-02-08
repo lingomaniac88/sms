@@ -55,14 +55,17 @@ f32 TMapWire::getPointPowerAtReleased(f32 pos) const
 
 void TMapWire::getPointPosAtReleased(f32 pos, JGeometry::TVec3<f32>* out) const
 {
-	f32 fVar6 = mDir.y * pos + mStartPoint.y;
-	f32 fVar4 = unk38;
-	f32 fVar5 = JMASSin(pos * 32768.0f);
+	JGeometry::TVec3<f32> local_a4;
+	getPointPosOnLine(pos, &local_a4);
 
-	out->x = mDir.x * pos + mStartPoint.x;
-	out->y = getPointPowerAtReleased(pos) * unk50.y
-				+ (1.0f - unk60) * (-(fVar4 * fVar5 - fVar6) - fVar6) + fVar6;
-	out->z = mDir.z * pos + mStartPoint.z;
+	JGeometry::TVec3<f32> aTStack_98;
+	getPointPosDefault(pos, &aTStack_98);
+
+	f32 power = getPointPowerAtReleased(pos);
+	f32 yAdjust
+	    = power * unk50.y + (1.0f - unk60) * (aTStack_98.y - local_a4.y);
+
+	out->set(local_a4.x, yAdjust + local_a4.y, local_a4.z);
 }
 
 void TMapWire::updatePointAtReleased(int) { }
