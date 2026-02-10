@@ -21,6 +21,16 @@ template <> struct SMatrix33C<f32> {
 template <typename T> struct TMatrix33 : public T {
 	TMatrix33() { }
 
+	// fabricated
+	void identity()
+	{
+		this->ref(0, 2) = this->ref(1, 2) = 0.0f;
+		this->ref(0, 1) = this->ref(2, 1) = 0.0f;
+		this->ref(1, 0) = this->ref(2, 0) = 0.0f;
+
+		this->ref(0, 0) = this->ref(1, 1) = this->ref(2, 2) = 1.0f;
+	}
+
 	// fabricated, possibly fake but still useful
 	static inline void multiplyInPlace(const TMatrix33& mtx, TVec3<f32>* vec)
 	{
