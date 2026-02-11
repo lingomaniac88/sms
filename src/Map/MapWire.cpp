@@ -206,7 +206,9 @@ f32 TMapWire::getPosInWire(const JGeometry::TVec3<f32>& param_1) const
  */
 void TMapWire::getPointPosOnLine(f32 pos, JGeometry::TVec3<f32>* out) const
 {
-	out->scaleAdd(pos, mStartPoint, mDir);
+	out->x = mStartPoint.x + pos * mDir.x;
+	out->y = mStartPoint.y + pos * mDir.y;
+	out->z = mStartPoint.z + pos * mDir.z;
 }
 
 void TMapWire::getPointPosOnWire(f32 param_1, JGeometry::TVec3<f32>* out) const
