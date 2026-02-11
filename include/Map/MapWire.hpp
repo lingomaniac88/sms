@@ -24,6 +24,8 @@ public:
 
 class TMapWire {
 public:
+	enum { IDLE = 0, HANGING = 1, RELEASED = 2 };
+
 	void drawLower() const;
 	void drawUpper() const;
 	f32 getPointPowerAtReleased(f32) const;
@@ -62,28 +64,30 @@ public:
 public:
 	/* 0x00 */ JGeometry::TVec3<f32> mStartPoint;
 	/* 0x0C */ JGeometry::TVec3<f32> mEndPoint;
-	/* 0x18 */ JGeometry::TVec3<f32> mDir;
+	/* 0x18 */ JGeometry::TVec3<f32> mWireSpan;
 	/* 0x24 */ f32 unk24;
 	/* 0x28 */ f32 unk28;
 	/* 0x2C */ f32 unk2C;
 	/* 0x30 */ f32 unk30;
 	/* 0x34 */ f32 unk34;
-	/* 0x38 */ f32 unk38;
-	/* 0x3C */ J3DModel* unk3C;
-	/* 0x40 */ J3DModel* unk40;
+	/* 0x38 */ f32 mWireSag;
+	/* 0x3C */ J3DModel* mStartFittingModel;
+	/* 0x40 */ J3DModel* mEndFittingModel;
 	/* 0x44 */ u16 mNumActiveMapWirePoints;
 	/* 0x46 */ u16 mNumMapWirePoints;
 	/* 0x48 */ TMapWirePoint* mMapWirePoints;
-	/* 0x4C */ f32 unk4C;
-	/* 0x50 */ JGeometry::TVec3<f32> unk50;
-	/* 0x5C */ f32 unk5C;
-	/* 0x60 */ f32 unk60;
-	/* 0x64 */ f32 unk64;
-	/* 0x68 */ f32 unk68;
+	/* 0x4C */ f32 mHangPosRatio;
+	/* 0x50 */ JGeometry::TVec3<f32>
+	    mHangOrBouncePoint; // Mario's location when hanging on the wire, or the
+	                        // amount of "bounce" when released
+	/* 0x5C */ f32 mMoveTimer; // Position in "bounce" cycle when released
+	/* 0x60 */ f32 mBounceRemainingPower;
+	/* 0x64 */ f32 mBounceAmplitude;
+	/* 0x68 */ f32 mBounceDecayRate;
 	/* 0x6C */ JGeometry::TVec2<f32> unk6C;
-	/* 0x74 */ f32 unk74;
-	/* 0x78 */ f32 unk78;
-	/* 0x7C */ u16 unk7C; // Probably an enum?
+	/* 0x74 */ f32 mHangReferencePos1;
+	/* 0x78 */ f32 mHangReferencePos2;
+	/* 0x7C */ u16 mState; // Probably an enum?
 };
 
 #endif
