@@ -257,16 +257,11 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 	JGeometry::TVec3<f32> local_c4(0.0f, 0.0f, unk30 * 0.5f);
 
 	JGeometry::TRotation3<TMtx33f> local_b8;
-	local_b8.ref(0, 2) = local_b8.ref(1, 2) = 0.0f;
-	local_b8.ref(0, 1) = local_b8.ref(2, 1) = 0.0f;
-	local_b8.ref(1, 0) = local_b8.ref(2, 0) = 0.0f;
-	local_b8.ref(0, 0) = local_b8.ref(1, 1) = local_b8.ref(2, 2) = 1.0f;
+	local_b8.identity();
 	local_b8.setEular((s16)(cubeInfo->getUnk18().x / 180.0f * 32768.0f),
 	                  (s16)(cubeInfo->getUnk18().y / 180.0f * 32768.0f),
 	                  (s16)(cubeInfo->getUnk18().z / 180.0f * 32768.0f));
-
-	// TODO: What the heck is going on with these inlines?!
-	TMtx33f::multiplyInPlaceNest2(local_b8, &local_c4);
+	local_b8.mult33(local_c4);
 
 	mStartPoint.x = cubeInfo->getUnkC().x - local_c4.x;
 	mStartPoint.y = cubeInfo->getUnkC().y - local_c4.y + cubeInfo->getUnk24().y;
@@ -286,10 +281,7 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 		f32 fVar15  = (f32)(i + 1) / (f32)(mNumMapWirePoints);
 		point.unk18 = point.unk1C = fVar15;
 
-		point.unk0C.x = mDir.x * point.unk18 + mStartPoint.x;
-		point.unk0C.y = mDir.y * point.unk18 + mStartPoint.y
-		                - unk38 * JMASSin(point.unk18 * 32768.0f);
-		point.unk0C.z = mDir.z * point.unk18 + mStartPoint.z;
+		getPointPosDefault(point.unk18, &point.unk0C);
 
 		point.unk00 = point.unk0C;
 		point.unk18 = point.unk1C;
