@@ -215,7 +215,8 @@ void TMapWire::getPointPosOnWire(f32 param_1, JGeometry::TVec3<f32>* out) const
 {
 	if (param_1 < 0.0f) {
 		param_1 = 0.0f;
-	} else if (param_1 > 1.0f) {
+	}
+	if (param_1 > 1.0f) {
 		param_1 = 1.0f;
 	}
 
