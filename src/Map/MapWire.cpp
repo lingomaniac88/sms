@@ -10,6 +10,7 @@
 #include <MarioUtil/MathUtil.hpp>
 #include <MarioUtil/ModelUtil.hpp>
 #include <MoveBG/MapObjManager.hpp>
+#include <Player/MarioAccess.hpp>
 
 TMapWirePoint::TMapWirePoint()
 {
@@ -84,7 +85,64 @@ void TMapWire::updateMovePointAtReleased() { }
 
 void TMapWire::initPointAtJustReleased(f32, TMapWirePoint*) { }
 
-void TMapWire::release() { }
+void TMapWire::release()
+{
+	if (unk7C == 2) {
+		return;
+	}
+
+	unk7C = 2;
+
+	unk50.zero();
+
+	mNumActiveMapWirePoints = mNumMapWirePoints;
+
+	int halfNumPoints = mNumActiveMapWirePoints / 2;
+
+	for (int index = 0; index < halfNumPoints; index++) {
+		TMapWirePoint& mapWirePoint = mMapWirePoints[index];
+
+		mapWirePoint.reset();
+
+		f32 pos            = unk4C / halfNumPoints * index;
+		mapWirePoint.unk18 = pos;
+
+		getPointPosAtReleased(pos, &mapWirePoint.unk00);
+
+		mapWirePoint.unk20 = (mapWirePoint.unk1C - pos) / 1000.0f;
+	}
+
+	for (int index = halfNumPoints; index < mNumMapWirePoints; index++) {
+		TMapWirePoint& mapWirePoint = mMapWirePoints[index];
+
+		mapWirePoint.reset();
+
+		f32 pos = (1.0f - unk4C) / (mNumMapWirePoints - halfNumPoints)
+		          * (index - halfNumPoints + 1);
+		mapWirePoint.unk18 = pos;
+
+		getPointPosAtReleased(pos, &mapWirePoint.unk00);
+
+		mapWirePoint.unk20 = (mapWirePoint.unk1C - pos) / 1000.0f;
+	}
+
+	f32 fVar1       = mStretchRate * fabsf(unk4C - 0.5f);
+	f32 marioSpeedY = *gpMarioSpeedY;
+	if (marioSpeedY > 0) {
+		// TODO: This feels like an inlined helper method
+		f32 marioSpeedSquared = *gpMarioSpeedX * *gpMarioSpeedX
+		                        + marioSpeedY * marioSpeedY
+		                        + *gpMarioSpeedZ * *gpMarioSpeedZ;
+		f32 marioSpeed = JGeometry::TUtil<f32>::inv_sqrt(marioSpeedSquared)
+		                 * marioSpeedSquared;
+		unk64 = mHeightRate * marioSpeed;
+	} else {
+		unk64 = mReleaseHeight;
+	}
+
+	unk68 = mDownRateMax * fVar1;
+	unk5C = unk60 = 1.0f;
+}
 
 void TMapWire::getPointPosAtHanged(f32 param_1,
                                    JGeometry::TVec3<f32>* out) const
