@@ -100,12 +100,12 @@ void TMapWire::release()
 
 	int halfNumPoints = mNumActiveMapWirePoints / 2;
 
-	for (int index = 0; index < halfNumPoints; index++) {
-		TMapWirePoint& mapWirePoint = mMapWirePoints[index];
+	for (int i = 0; i < halfNumPoints; i++) {
+		TMapWirePoint& mapWirePoint = mMapWirePoints[i];
 
 		mapWirePoint.reset();
 
-		f32 pos            = mHangPosRatio / halfNumPoints * index;
+		f32 pos            = mHangPosRatio / halfNumPoints * i;
 		mapWirePoint.unk18 = pos;
 
 		getPointPosAtReleased(pos, &mapWirePoint.unk00);
@@ -113,13 +113,13 @@ void TMapWire::release()
 		mapWirePoint.unk20 = (mapWirePoint.unk1C - pos) / 1000.0f;
 	}
 
-	for (int index = halfNumPoints; index < mNumMapWirePoints; index++) {
-		TMapWirePoint& mapWirePoint = mMapWirePoints[index];
+	for (int i = halfNumPoints; i < mNumMapWirePoints; i++) {
+		TMapWirePoint& mapWirePoint = mMapWirePoints[i];
 
 		mapWirePoint.reset();
 
 		f32 pos = (1.0f - mHangPosRatio) / (mNumMapWirePoints - halfNumPoints)
-		          * (index - halfNumPoints + 1);
+		          * (i - halfNumPoints + 1);
 		mapWirePoint.unk18 = pos;
 
 		getPointPosAtReleased(pos, &mapWirePoint.unk00);
@@ -237,15 +237,15 @@ void TMapWire::move()
 	if (bVar4) {
 		TMapWirePoint* mapWirePoint;
 
-		for (int index = 0; index < mNumActiveMapWirePoints; index++) {
-			mapWirePoint = &mMapWirePoints[index];
+		for (int i = 0; i < mNumActiveMapWirePoints; i++) {
+			mapWirePoint = &mMapWirePoints[i];
 			mapWirePoint->reset();
 		}
 
 		mState = TMapWire::IDLE;
 	} else {
-		for (int index = 0; index < mNumActiveMapWirePoints; index++) {
-			updatePointAtReleased(index);
+		for (int i = 0; i < mNumActiveMapWirePoints; i++) {
+			updatePointAtReleased(i);
 		}
 	}
 }
