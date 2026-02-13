@@ -153,7 +153,12 @@ void TMapWire::updatePointAtReleased(int index)
 
 void TMapWire::updateMovePointAtReleased() { }
 
-void TMapWire::initPointAtJustReleased(f32, TMapWirePoint*) { }
+void TMapWire::initPointAtJustReleased(f32 pos, TMapWirePoint* point)
+{
+	point->unk18 = pos;
+	getPointPosAtReleased(pos, &point->unk00);
+	point->unk20 = (point->unk1C - pos) / 1000.0f;
+}
 
 void TMapWire::release()
 {
@@ -167,33 +172,26 @@ void TMapWire::release()
 
 	mNumActiveMapWirePoints = mNumMapWirePoints;
 
-	int halfNumPoints = mNumActiveMapWirePoints / 2;
+	int halfNumPoints      = mNumActiveMapWirePoints / 2;
+	f32 posAdvancePerPoint = mHangPos / halfNumPoints;
 
 	for (int i = 0; i < halfNumPoints; i++) {
 		TMapWirePoint& mapWirePoint = mMapWirePoints[i];
-
 		mapWirePoint.reset();
 
-		f32 pos            = mHangPos / halfNumPoints * i;
-		mapWirePoint.unk18 = pos;
-
-		getPointPosAtReleased(pos, &mapWirePoint.unk00);
-
-		mapWirePoint.unk20 = (mapWirePoint.unk1C - pos) / 1000.0f;
+		f32 pos = posAdvancePerPoint * i;
+		initPointAtJustReleased(pos, &mapWirePoint);
 	}
+
+	posAdvancePerPoint
+	    = (1.0f - mHangPos) / (mNumMapWirePoints - halfNumPoints);
 
 	for (int i = halfNumPoints; i < mNumMapWirePoints; i++) {
 		TMapWirePoint& mapWirePoint = mMapWirePoints[i];
-
 		mapWirePoint.reset();
 
-		f32 pos = (1.0f - mHangPos) / (mNumMapWirePoints - halfNumPoints)
-		          * (i - halfNumPoints + 1);
-		mapWirePoint.unk18 = pos;
-
-		getPointPosAtReleased(pos, &mapWirePoint.unk00);
-
-		mapWirePoint.unk20 = (mapWirePoint.unk1C - pos) / 1000.0f;
+		f32 pos = posAdvancePerPoint * (i - halfNumPoints + 1) + mHangPos;
+		initPointAtJustReleased(pos, &mapWirePoint);
 	}
 
 	f32 stretchRatio = mStretchRate * fabsf(mHangPos - 0.5f);
@@ -201,8 +199,8 @@ void TMapWire::release()
 	f32 marioSpeedY = *gpMarioSpeedY;
 	if (marioSpeedY > 0) {
 		// TODO: This feels like an inlined helper method
-		f32 marioSpeedX = *gpMarioSpeedX;
-		f32 marioSpeedZ = *gpMarioSpeedZ;
+		f32 marioSpeedX       = *gpMarioSpeedX;
+		f32 marioSpeedZ       = *gpMarioSpeedZ;
 		f32 marioSpeedSquared = marioSpeedX * marioSpeedX
 		                        + marioSpeedY * marioSpeedY
 		                        + marioSpeedZ * marioSpeedZ;
