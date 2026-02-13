@@ -201,9 +201,11 @@ void TMapWire::release()
 	f32 marioSpeedY = *gpMarioSpeedY;
 	if (marioSpeedY > 0) {
 		// TODO: This feels like an inlined helper method
-		f32 marioSpeedSquared = *gpMarioSpeedX * *gpMarioSpeedX
+		f32 marioSpeedX = *gpMarioSpeedX;
+		f32 marioSpeedZ = *gpMarioSpeedZ;
+		f32 marioSpeedSquared = marioSpeedX * marioSpeedX
 		                        + marioSpeedY * marioSpeedY
-		                        + *gpMarioSpeedZ * *gpMarioSpeedZ;
+		                        + marioSpeedZ * marioSpeedZ;
 		f32 marioSpeed = JGeometry::TUtil<f32>::inv_sqrt(marioSpeedSquared)
 		                 * marioSpeedSquared;
 		mBounceAmplitude = mHeightRate * marioSpeed;
