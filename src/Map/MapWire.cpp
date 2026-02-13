@@ -238,10 +238,11 @@ void TMapWire::getPointPosAtHanged(f32 pos, JGeometry::TVec3<f32>* out) const
 	}
 }
 
-// TODO: What the heck is this anyway?
 void TMapWire::getPointInfoAtHanged(f32 pos, TMapWirePoint* point)
 {
-	getPointPosAtHanged(pos, &point->unk00);
+	JGeometry::TVec3<f32> outPoint;
+	getPointPosAtHanged(pos, &outPoint);
+	point->unk00.set(outPoint.x, outPoint.y, outPoint.z);
 }
 
 void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
