@@ -76,7 +76,7 @@ public:
 	/* 0x44 */ u16 mNumActiveMapWirePoints;
 	/* 0x46 */ u16 mNumMapWirePoints;
 	/* 0x48 */ TMapWirePoint* mMapWirePoints;
-	/* 0x4C */ f32 mHangPosRatio;
+	/* 0x4C */ f32 mHangPos;
 	/* 0x50 */ JGeometry::TVec3<f32>
 	    mHangOrBouncePoint; // Mario's location when hanging on the wire, or the
 	                        // amount of "bounce" when released

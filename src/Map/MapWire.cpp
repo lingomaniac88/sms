@@ -114,10 +114,10 @@ f32 TMapWire::getPointPowerAtReleased(f32 pos) const
 {
 	// 1 = default height, 0 = stretched all the way down
 	f32 relativeHeightAtPos;
-	if (pos >= mHangPosRatio) {
-		relativeHeightAtPos = (pos - mHangPosRatio) / (1.0f - mHangPosRatio);
+	if (pos >= mHangPos) {
+		relativeHeightAtPos = (pos - mHangPos) / (1.0f - mHangPos);
 	} else {
-		relativeHeightAtPos = 1.0f - pos / mHangPosRatio;
+		relativeHeightAtPos = 1.0f - pos / mHangPos;
 	}
 
 	return 1.0f - relativeHeightAtPos * relativeHeightAtPos;
@@ -174,7 +174,7 @@ void TMapWire::release()
 
 		mapWirePoint.reset();
 
-		f32 pos            = mHangPosRatio / halfNumPoints * i;
+		f32 pos            = mHangPos / halfNumPoints * i;
 		mapWirePoint.unk18 = pos;
 
 		getPointPosAtReleased(pos, &mapWirePoint.unk00);
@@ -187,7 +187,7 @@ void TMapWire::release()
 
 		mapWirePoint.reset();
 
-		f32 pos = (1.0f - mHangPosRatio) / (mNumMapWirePoints - halfNumPoints)
+		f32 pos = (1.0f - mHangPos) / (mNumMapWirePoints - halfNumPoints)
 		          * (i - halfNumPoints + 1);
 		mapWirePoint.unk18 = pos;
 
@@ -196,7 +196,8 @@ void TMapWire::release()
 		mapWirePoint.unk20 = (mapWirePoint.unk1C - pos) / 1000.0f;
 	}
 
-	f32 fVar1       = mStretchRate * fabsf(mHangPosRatio - 0.5f);
+	f32 stretchRatio = mStretchRate * fabsf(mHangPos - 0.5f);
+
 	f32 marioSpeedY = *gpMarioSpeedY;
 	if (marioSpeedY > 0) {
 		// TODO: This feels like an inlined helper method
@@ -210,28 +211,27 @@ void TMapWire::release()
 		mBounceAmplitude = mReleaseHeight;
 	}
 
-	mBounceDecayRate      = mDownRateMax * fVar1;
+	mBounceDecayRate      = mDownRateMax * stretchRatio;
 	mBounceRemainingPower = 1.0f;
 	mMoveTimer            = 1.0f;
 }
 
-void TMapWire::getPointPosAtHanged(f32 param_1,
-                                   JGeometry::TVec3<f32>* out) const
+void TMapWire::getPointPosAtHanged(f32 pos, JGeometry::TVec3<f32>* out) const
 {
-	f32 fVar1 = param_1 - mHangPosRatio;
+	f32 posOffset = pos - mHangPos;
 
-	out->x = mWireSpan.x * fVar1 + mHangOrBouncePoint.x;
-	out->z = mWireSpan.z * fVar1 + mHangOrBouncePoint.z;
+	out->x = mWireSpan.x * posOffset + mHangOrBouncePoint.x;
+	out->z = mWireSpan.z * posOffset + mHangOrBouncePoint.z;
 
-	if (param_1 <= mHangReferencePos1) {
+	if (pos <= mHangReferencePos1) {
 		out->y = mHangOrBouncePoint.y
 		         + ((mStartPoint.y - mHangOrBouncePoint.y)
-		            * (mHangReferencePos1 - param_1))
+		            * (mHangReferencePos1 - pos))
 		               / mHangReferencePos1;
-	} else if (param_1 >= mHangReferencePos2) {
+	} else if (pos >= mHangReferencePos2) {
 		out->y = mHangOrBouncePoint.y
 		         + ((mEndPoint.y - mHangOrBouncePoint.y)
-		            * (param_1 - mHangReferencePos2))
+		            * (pos - mHangReferencePos2))
 		               / (1.0f - mHangReferencePos2);
 	} else {
 		out->y = mHangOrBouncePoint.y;
@@ -250,26 +250,26 @@ void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 
 	mHangOrBouncePoint.set(mtx[0][3], mtx[1][3],
 	                       mtx[2][3]); // translate portion of matrix
-	mHangPosRatio = getPosInWire(mHangOrBouncePoint);
+	mHangPos = getPosInWire(mHangOrBouncePoint);
 
-	mHangReferencePos1 = mHangPosRatio - mFootLength / unk30;
-	mHangReferencePos2 = mHangPosRatio + mFootLength / unk30;
+	mHangReferencePos1 = mHangPos - mFootLength / unk30;
+	mHangReferencePos2 = mHangPos + mFootLength / unk30;
 
 	mNumActiveMapWirePoints = 2;
 
-	if (mFootLength < mHangPosRatio * unk30) {
+	if (mFootLength < mHangPos * unk30) {
 		mMapWirePoints[0].unk18 = mHangReferencePos1;
 		getPointInfoAtHanged(mHangReferencePos1, &mMapWirePoints[0]);
 	} else {
-		mMapWirePoints[0].unk18 = mHangPosRatio;
+		mMapWirePoints[0].unk18 = mHangPos;
 		mMapWirePoints[0].unk00.set(mHangOrBouncePoint);
 	}
 
-	if (mFootLength < (1.0f - mHangPosRatio) * unk30) {
+	if (mFootLength < (1.0f - mHangPos) * unk30) {
 		mMapWirePoints[1].unk18 = mHangReferencePos2;
 		getPointInfoAtHanged(mHangReferencePos2, &mMapWirePoints[1]);
 	} else {
-		mMapWirePoints[1].unk18 = mHangPosRatio;
+		mMapWirePoints[1].unk18 = mHangPos;
 		mMapWirePoints[1].unk00.set(mHangOrBouncePoint);
 	}
 }
@@ -282,7 +282,7 @@ void TMapWire::calcViewAndDBEntry()
 
 void TMapWire::move()
 {
-	bool bVar4;
+	bool bounceFinished;
 
 	if (mState != TMapWire::RELEASED) {
 		return;
@@ -291,19 +291,19 @@ void TMapWire::move()
 	mBounceRemainingPower -= mBounceDecayRate;
 
 	if (mBounceRemainingPower < TMapWire::mEndRate) {
-		bVar4 = true;
+		bounceFinished = true;
 	} else {
 		mMoveTimer += TMapWire::mMoveTimerSpeed;
 		if (mMoveTimer >= 2.0f) {
 			mMoveTimer -= 2.0f;
 		}
-		bVar4 = false;
+		bounceFinished = false;
 
 		mHangOrBouncePoint.y = mBounceAmplitude * JMASCos(mMoveTimer * 32768.0f)
 		                       * mBounceRemainingPower;
 	}
 
-	if (bVar4) {
+	if (bounceFinished) {
 		TMapWirePoint* mapWirePoint;
 
 		for (int i = 0; i < mNumActiveMapWirePoints; i++) {
@@ -319,17 +319,19 @@ void TMapWire::move()
 	}
 }
 
-f32 TMapWire::getPosInWire(const JGeometry::TVec3<f32>& param_1) const
+f32 TMapWire::getPosInWire(const JGeometry::TVec3<f32>& point) const
 {
-	JGeometry::TVec3<f32> vecA = mStartPoint;
-	JGeometry::TVec3<f32> vecB = mEndPoint;
-	vecA.y                     = 0.0f;
-	vecB.y                     = 0.0f;
+	// Position here is only considered in the horizontal plane
+	JGeometry::TVec3<f32> flatStart = mStartPoint;
+	JGeometry::TVec3<f32> flatEnd   = mEndPoint;
+	flatStart.y                     = 0.0f;
+	flatEnd.y                       = 0.0f;
 
-	JGeometry::TVec3<f32> vecD = MsPerpendicFootToLineR(vecA, vecB, param_1);
+	JGeometry::TVec3<f32> perpPoint
+	    = MsPerpendicFootToLineR(flatStart, flatEnd, point);
 
-	f32 totalLength   = (vecA - vecB).length();
-	f32 partialLength = (vecD - vecA).length();
+	f32 totalLength   = (flatStart - flatEnd).length();
+	f32 partialLength = (perpPoint - flatStart).length();
 	return partialLength / totalLength;
 }
 
@@ -346,19 +348,19 @@ void TMapWire::getPointPosOnLine(f32 pos, JGeometry::TVec3<f32>* out) const
 	out->z = mStartPoint.z + pos * mWireSpan.z;
 }
 
-void TMapWire::getPointPosOnWire(f32 param_1, JGeometry::TVec3<f32>* out) const
+void TMapWire::getPointPosOnWire(f32 pos, JGeometry::TVec3<f32>* out) const
 {
-	if (param_1 < 0.0f) {
-		param_1 = 0.0f;
+	if (pos < 0.0f) {
+		pos = 0.0f;
 	}
-	if (param_1 > 1.0f) {
-		param_1 = 1.0f;
+	if (pos > 1.0f) {
+		pos = 1.0f;
 	}
 
 	if (mState == TMapWire::HANGING) {
-		getPointPosAtHanged(param_1, out);
+		getPointPosAtHanged(pos, out);
 	} else {
-		getPointPosAtReleased(param_1, out);
+		getPointPosAtReleased(pos, out);
 	}
 }
 
@@ -389,22 +391,22 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 
 	unk30 = cubeInfo->getUnk24().z;
 
-	JGeometry::TVec3<f32> local_c4(0.0f, 0.0f, unk30 * 0.5f);
+	JGeometry::TVec3<f32> halfWire(0.0f, 0.0f, unk30 * 0.5f);
 
-	JGeometry::TRotation3<TMtx33f> local_b8;
-	local_b8.identity();
-	local_b8.setEular((s16)(cubeInfo->getUnk18().x / 180.0f * 32768.0f),
-	                  (s16)(cubeInfo->getUnk18().y / 180.0f * 32768.0f),
-	                  (s16)(cubeInfo->getUnk18().z / 180.0f * 32768.0f));
-	local_b8.mult33(local_c4);
+	JGeometry::TRotation3<TMtx33f> wireTransform;
+	wireTransform.identity();
+	wireTransform.setEular((s16)(cubeInfo->getUnk18().x / 180.0f * 32768.0f),
+	                       (s16)(cubeInfo->getUnk18().y / 180.0f * 32768.0f),
+	                       (s16)(cubeInfo->getUnk18().z / 180.0f * 32768.0f));
+	wireTransform.mult33(halfWire);
 
-	mStartPoint.x = cubeInfo->getUnkC().x - local_c4.x;
-	mStartPoint.y = cubeInfo->getUnkC().y - local_c4.y + cubeInfo->getUnk24().y;
-	mStartPoint.z = cubeInfo->getUnkC().z - local_c4.z;
+	mStartPoint.x = cubeInfo->getUnkC().x - halfWire.x;
+	mStartPoint.y = cubeInfo->getUnkC().y - halfWire.y + cubeInfo->getUnk24().y;
+	mStartPoint.z = cubeInfo->getUnkC().z - halfWire.z;
 
-	mEndPoint.x = local_c4.x + cubeInfo->getUnkC().x;
-	mEndPoint.y = local_c4.y + cubeInfo->getUnkC().y + cubeInfo->getUnk24().y;
-	mEndPoint.z = local_c4.z + cubeInfo->getUnkC().z;
+	mEndPoint.x = halfWire.x + cubeInfo->getUnkC().x;
+	mEndPoint.y = halfWire.y + cubeInfo->getUnkC().y + cubeInfo->getUnk24().y;
+	mEndPoint.z = halfWire.z + cubeInfo->getUnkC().z;
 
 	mWireSpan = mEndPoint - mStartPoint;
 
@@ -413,8 +415,8 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 	for (int i = 0; i < mNumMapWirePoints; i++) {
 		TMapWirePoint& point = mMapWirePoints[i];
 
-		f32 fVar15  = (f32)(i + 1) / (f32)(mNumMapWirePoints);
-		point.unk18 = point.unk1C = fVar15;
+		f32 pos     = (f32)(i + 1) / (f32)(mNumMapWirePoints);
+		point.unk18 = point.unk1C = pos;
 
 		getPointPosDefault(point.unk18, &point.unk0C);
 
@@ -474,7 +476,7 @@ TMapWire::TMapWire()
 	mNumActiveMapWirePoints = 0;
 	mNumMapWirePoints       = 0;
 	mMapWirePoints          = nullptr;
-	mHangPosRatio           = 0.0f;
+	mHangPos                = 0.0f;
 	mMoveTimer              = 0.0f;
 	mBounceRemainingPower   = 0.0f;
 	mBounceAmplitude        = 0.0f;
