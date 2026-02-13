@@ -37,9 +37,78 @@ f32 TMapWire::mFootLength     = 26.0f;
 f32 TMapWire::mDrawWidth      = 5.0f;
 f32 TMapWire::mDrawHeight     = 6.0f;
 
-void TMapWire::drawLower() const { }
+void TMapWire::drawLower() const
+{
+	f32 xOffset = unk6C.x * mDrawWidth;
+	f32 zOffset = unk6C.y * mDrawWidth;
 
-void TMapWire::drawUpper() const { }
+	GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, (mNumActiveMapWirePoints + 2) * 2);
+
+	GXPosition3f32(mStartPoint.x - xOffset, mStartPoint.y,
+	               mStartPoint.z - zOffset);
+	GXPosition3f32(mStartPoint.x, mStartPoint.y - mDrawHeight, mStartPoint.z);
+
+	for (int i = 0; i < mNumActiveMapWirePoints; i++) {
+		GXPosition3f32(mMapWirePoints[i].unk00.x - xOffset,
+		               mMapWirePoints[i].unk00.y,
+		               mMapWirePoints[i].unk00.z - zOffset);
+		GXPosition3f32(mMapWirePoints[i].unk00.x,
+		               mMapWirePoints[i].unk00.y - mDrawHeight,
+		               mMapWirePoints[i].unk00.z);
+	}
+
+	GXPosition3f32(mEndPoint.x - xOffset, mEndPoint.y, mEndPoint.z - zOffset);
+	GXPosition3f32(mEndPoint.x, mEndPoint.y - mDrawHeight, mEndPoint.z);
+
+	GXEnd();
+
+	GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, (mNumActiveMapWirePoints + 2) * 2);
+
+	GXPosition3f32(mStartPoint.x, mStartPoint.y - mDrawHeight, mStartPoint.z);
+	GXPosition3f32(mStartPoint.x + xOffset, mStartPoint.y,
+	               mStartPoint.z + zOffset);
+
+	for (int i = 0; i < mNumActiveMapWirePoints; i++) {
+		GXPosition3f32(mMapWirePoints[i].unk00.x,
+		               mMapWirePoints[i].unk00.y - mDrawHeight,
+		               mMapWirePoints[i].unk00.z);
+		GXPosition3f32(mMapWirePoints[i].unk00.x + xOffset,
+		               mMapWirePoints[i].unk00.y,
+		               mMapWirePoints[i].unk00.z + zOffset);
+	}
+
+	GXPosition3f32(mEndPoint.x, mEndPoint.y - mDrawHeight, mEndPoint.z);
+	GXPosition3f32(mEndPoint.x + xOffset, mEndPoint.y, mEndPoint.z + zOffset);
+
+	GXEnd();
+}
+
+void TMapWire::drawUpper() const
+{
+	f32 xOffset = unk6C.x * mDrawWidth;
+	f32 zOffset = unk6C.y * mDrawWidth;
+
+	GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, (mNumActiveMapWirePoints + 2) * 2);
+
+	GXPosition3f32(mStartPoint.x + xOffset, mStartPoint.y,
+	               mStartPoint.z + zOffset);
+	GXPosition3f32(mStartPoint.x - xOffset, mStartPoint.y,
+	               mStartPoint.z - zOffset);
+
+	for (int index = 0; index < mNumActiveMapWirePoints; index++) {
+		GXPosition3f32(mMapWirePoints[index].unk00.x + xOffset,
+		               mMapWirePoints[index].unk00.y,
+		               mMapWirePoints[index].unk00.z + zOffset);
+		GXPosition3f32(mMapWirePoints[index].unk00.x - xOffset,
+		               mMapWirePoints[index].unk00.y,
+		               mMapWirePoints[index].unk00.z - zOffset);
+	}
+
+	GXPosition3f32(mEndPoint.x + xOffset, mEndPoint.y, mEndPoint.z + zOffset);
+	GXPosition3f32(mEndPoint.x - xOffset, mEndPoint.y, mEndPoint.z - zOffset);
+
+	GXEnd();
+}
 
 f32 TMapWire::getPointPowerAtReleased(f32 pos) const
 {
