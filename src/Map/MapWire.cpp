@@ -385,17 +385,8 @@ void TMapWire::getPointPosDefault(f32 pos, JGeometry::TVec3<f32>* out) const
 	         basePoint.z);
 }
 
-void TMapWire::initTipPoints(const TCubeGeneralInfo*) { }
-
-void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
+void TMapWire::initTipPoints(const TCubeGeneralInfo* cubeInfo)
 {
-	mNumMapWirePoints = (s32)((cubeInfo->getUnk24().z / 50.0f + 1.0f) - 2.0f);
-	mNumActiveMapWirePoints = mNumMapWirePoints;
-
-	mMapWirePoints = new TMapWirePoint[mNumMapWirePoints];
-
-	unk30 = cubeInfo->getUnk24().z;
-
 	JGeometry::TVec3<f32> halfWire(0.0f, 0.0f, unk30 * 0.5f);
 
 	JGeometry::TRotation3<TMtx33f> wireTransform;
@@ -414,6 +405,18 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 	mEndPoint.z = halfWire.z + cubeInfo->getUnkC().z;
 
 	mWireSpan = mEndPoint - mStartPoint;
+}
+
+void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
+{
+	mNumMapWirePoints = (s32)((cubeInfo->getUnk24().z / 50.0f + 1.0f) - 2.0f);
+	mNumActiveMapWirePoints = mNumMapWirePoints;
+
+	mMapWirePoints = new TMapWirePoint[mNumMapWirePoints];
+
+	unk30 = cubeInfo->getUnk24().z;
+
+	initTipPoints(cubeInfo);
 
 	mWireSag = cubeInfo->getUnk24().y * 0.5f;
 
