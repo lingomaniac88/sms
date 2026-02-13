@@ -132,11 +132,12 @@ void TMapWire::getPointPosAtReleased(f32 pos, JGeometry::TVec3<f32>* out) const
 	getPointPosDefault(pos, &aTStack_98);
 
 	f32 power = getPointPowerAtReleased(pos);
-	f32 yAdjust
-	    = power * mHangOrBouncePoint.y
-	      + (1.0f - mBounceRemainingPower) * (aTStack_98.y - local_a4.y);
+	f32 yAdjusted
+	    = local_a4.y
+	      + (1.0f - mBounceRemainingPower) * (aTStack_98.y - local_a4.y)
+	      + power * mHangOrBouncePoint.y;
 
-	out->set(local_a4.x, yAdjust + local_a4.y, local_a4.z);
+	out->set(local_a4.x, yAdjusted, local_a4.z);
 }
 
 void TMapWire::updatePointAtReleased(int index)
