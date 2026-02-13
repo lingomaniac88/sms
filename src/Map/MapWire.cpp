@@ -265,8 +265,8 @@ void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 		JGeometry::TVec3<f32> point;
 		getPointInfoAtHanged(mHangReferencePos1, refPoint1);
 	} else {
-		mMapWirePoints[0].unk18 = mHangPos;
-		mMapWirePoints[0].unk00.set(mHangOrBouncePoint);
+		refPoint1->unk18 = mHangPos;
+		refPoint1->unk00.set(mHangOrBouncePoint.x, mHangOrBouncePoint.y, mHangOrBouncePoint.z);
 	}
 
 	TMapWirePoint* refPoint2 = &mMapWirePoints[1];
@@ -275,7 +275,7 @@ void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 		getPointInfoAtHanged(mHangReferencePos2, refPoint2);
 	} else {
 		refPoint2->unk18 = mHangPos;
-		refPoint2->unk00.set(mHangOrBouncePoint);
+		refPoint2->unk00.set(mHangOrBouncePoint.x, mHangOrBouncePoint.y, mHangOrBouncePoint.z);
 	}
 }
 
