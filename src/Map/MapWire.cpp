@@ -177,22 +177,22 @@ void TMapWire::release()
 	f32 posAdvancePerPoint = mHangPos / halfNumPoints;
 
 	for (int i = 0; i < halfNumPoints; i++) {
-		TMapWirePoint& mapWirePoint = mMapWirePoints[i];
-		mapWirePoint.reset();
+		TMapWirePoint* mapWirePoint = &mMapWirePoints[i];
+		mapWirePoint->reset();
 
 		f32 pos = posAdvancePerPoint * i;
-		initPointAtJustReleased(pos, &mapWirePoint);
+		initPointAtJustReleased(pos, mapWirePoint);
 	}
 
 	posAdvancePerPoint
 	    = (1.0f - mHangPos) / (mNumMapWirePoints - halfNumPoints);
 
 	for (int i = halfNumPoints; i < mNumMapWirePoints; i++) {
-		TMapWirePoint& mapWirePoint = mMapWirePoints[i];
-		mapWirePoint.reset();
+		TMapWirePoint* mapWirePoint = &mMapWirePoints[i];
+		mapWirePoint->reset();
 
 		f32 pos = posAdvancePerPoint * (i - halfNumPoints + 1) + mHangPos;
-		initPointAtJustReleased(pos, &mapWirePoint);
+		initPointAtJustReleased(pos, mapWirePoint);
 	}
 
 	f32 stretchRatio = mStretchRate * fabsf(mHangPos - 0.5f);
@@ -266,7 +266,8 @@ void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 		getPointInfoAtHanged(mHangReferencePos1, refPoint1);
 	} else {
 		refPoint1->unk18 = mHangPos;
-		refPoint1->unk00.set(mHangOrBouncePoint.x, mHangOrBouncePoint.y, mHangOrBouncePoint.z);
+		refPoint1->unk00.set(mHangOrBouncePoint.x, mHangOrBouncePoint.y,
+		                     mHangOrBouncePoint.z);
 	}
 
 	TMapWirePoint* refPoint2 = &mMapWirePoints[1];
@@ -275,7 +276,8 @@ void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 		getPointInfoAtHanged(mHangReferencePos2, refPoint2);
 	} else {
 		refPoint2->unk18 = mHangPos;
-		refPoint2->unk00.set(mHangOrBouncePoint.x, mHangOrBouncePoint.y, mHangOrBouncePoint.z);
+		refPoint2->unk00.set(mHangOrBouncePoint.x, mHangOrBouncePoint.y,
+		                     mHangOrBouncePoint.z);
 	}
 }
 
@@ -421,15 +423,14 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 	mWireSag = cubeInfo->getUnk24().y * 0.5f;
 
 	for (int i = 0; i < mNumMapWirePoints; i++) {
-		TMapWirePoint& point = mMapWirePoints[i];
+		TMapWirePoint* point = &mMapWirePoints[i];
 
-		f32 pos     = (f32)(i + 1) / (f32)(mNumMapWirePoints);
-		point.unk18 = point.unk1C = pos;
+		f32 pos      = (f32)(i + 1) / (f32)(mNumMapWirePoints);
+		point->unk18 = point->unk1C = pos;
 
-		getPointPosDefault(point.unk18, &point.unk0C);
+		getPointPosDefault(point->unk18, &point->unk0C);
 
-		point.unk00 = point.unk0C;
-		point.unk18 = point.unk1C;
+		point->reset();
 	}
 
 	if (mEndPoint.x != mStartPoint.x) {
