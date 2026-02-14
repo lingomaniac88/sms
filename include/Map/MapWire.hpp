@@ -15,11 +15,11 @@ public:
 	void reset();
 
 public:
-	JGeometry::TVec3<f32> unk00;
-	JGeometry::TVec3<f32> unk0C;
-	f32 unk18;
-	f32 unk1C;
-	f32 unk20;
+	JGeometry::TVec3<f32> mPosition;
+	JGeometry::TVec3<f32> mDefaultPosition;
+	f32 mPosOnWire;
+	f32 mDefaultPosOnWire;
+	f32 mPosReturnRate;
 };
 
 class TMapWire {

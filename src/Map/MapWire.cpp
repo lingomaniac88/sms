@@ -14,17 +14,17 @@
 
 TMapWirePoint::TMapWirePoint()
 {
-	unk18 = 0.0f;
-	unk20 = 0.0f;
-	unk00.zero();
-	unk0C.zero();
+	mPosOnWire     = 0.0f;
+	mPosReturnRate = 0.0f;
+	mPosition.zero();
+	mDefaultPosition.zero();
 }
 
 // fabricated but convenient for now
 void TMapWirePoint::reset()
 {
-	unk00 = unk0C;
-	unk18 = unk1C;
+	mPosition  = mDefaultPosition;
+	mPosOnWire = mDefaultPosOnWire;
 }
 
 f32 TMapWire::mMoveTimerSpeed = 0.03f;
@@ -49,12 +49,12 @@ void TMapWire::drawLower() const
 	GXPosition3f32(mStartPoint.x, mStartPoint.y - mDrawHeight, mStartPoint.z);
 
 	for (int i = 0; i < mNumActiveMapWirePoints; i++) {
-		GXPosition3f32(mMapWirePoints[i].unk00.x - xOffset,
-		               mMapWirePoints[i].unk00.y,
-		               mMapWirePoints[i].unk00.z - zOffset);
-		GXPosition3f32(mMapWirePoints[i].unk00.x,
-		               mMapWirePoints[i].unk00.y - mDrawHeight,
-		               mMapWirePoints[i].unk00.z);
+		GXPosition3f32(mMapWirePoints[i].mPosition.x - xOffset,
+		               mMapWirePoints[i].mPosition.y,
+		               mMapWirePoints[i].mPosition.z - zOffset);
+		GXPosition3f32(mMapWirePoints[i].mPosition.x,
+		               mMapWirePoints[i].mPosition.y - mDrawHeight,
+		               mMapWirePoints[i].mPosition.z);
 	}
 
 	GXPosition3f32(mEndPoint.x - xOffset, mEndPoint.y, mEndPoint.z - zOffset);
@@ -69,12 +69,12 @@ void TMapWire::drawLower() const
 	               mStartPoint.z + zOffset);
 
 	for (int i = 0; i < mNumActiveMapWirePoints; i++) {
-		GXPosition3f32(mMapWirePoints[i].unk00.x,
-		               mMapWirePoints[i].unk00.y - mDrawHeight,
-		               mMapWirePoints[i].unk00.z);
-		GXPosition3f32(mMapWirePoints[i].unk00.x + xOffset,
-		               mMapWirePoints[i].unk00.y,
-		               mMapWirePoints[i].unk00.z + zOffset);
+		GXPosition3f32(mMapWirePoints[i].mPosition.x,
+		               mMapWirePoints[i].mPosition.y - mDrawHeight,
+		               mMapWirePoints[i].mPosition.z);
+		GXPosition3f32(mMapWirePoints[i].mPosition.x + xOffset,
+		               mMapWirePoints[i].mPosition.y,
+		               mMapWirePoints[i].mPosition.z + zOffset);
 	}
 
 	GXPosition3f32(mEndPoint.x, mEndPoint.y - mDrawHeight, mEndPoint.z);
@@ -96,12 +96,12 @@ void TMapWire::drawUpper() const
 	               mStartPoint.z - zOffset);
 
 	for (int index = 0; index < mNumActiveMapWirePoints; index++) {
-		GXPosition3f32(mMapWirePoints[index].unk00.x + xOffset,
-		               mMapWirePoints[index].unk00.y,
-		               mMapWirePoints[index].unk00.z + zOffset);
-		GXPosition3f32(mMapWirePoints[index].unk00.x - xOffset,
-		               mMapWirePoints[index].unk00.y,
-		               mMapWirePoints[index].unk00.z - zOffset);
+		GXPosition3f32(mMapWirePoints[index].mPosition.x + xOffset,
+		               mMapWirePoints[index].mPosition.y,
+		               mMapWirePoints[index].mPosition.z + zOffset);
+		GXPosition3f32(mMapWirePoints[index].mPosition.x - xOffset,
+		               mMapWirePoints[index].mPosition.y,
+		               mMapWirePoints[index].mPosition.z - zOffset);
 	}
 
 	GXPosition3f32(mEndPoint.x + xOffset, mEndPoint.y, mEndPoint.z + zOffset);
@@ -144,21 +144,22 @@ void TMapWire::updatePointAtReleased(int index)
 {
 	TMapWirePoint* mapWirePoint = &mMapWirePoints[index];
 
-	f32 pos = mapWirePoint->unk1C;
-	if (fabsf(pos - mapWirePoint->unk18) > fabsf(mapWirePoint->unk20)) {
-		pos = mapWirePoint->unk18 + mapWirePoint->unk20;
+	f32 pos = mapWirePoint->mDefaultPosOnWire;
+	if (fabsf(pos - mapWirePoint->mPosOnWire)
+	    > fabsf(mapWirePoint->mPosReturnRate)) {
+		pos = mapWirePoint->mPosOnWire + mapWirePoint->mPosReturnRate;
 	}
 
-	getPointPosAtReleased(pos, &mapWirePoint->unk00);
+	getPointPosAtReleased(pos, &mapWirePoint->mPosition);
 }
 
 void TMapWire::updateMovePointAtReleased() { }
 
 void TMapWire::initPointAtJustReleased(f32 pos, TMapWirePoint* point)
 {
-	point->unk18 = pos;
-	getPointPosAtReleased(pos, &point->unk00);
-	point->unk20 = (point->unk1C - pos) / 1000.0f;
+	point->mPosOnWire = pos;
+	getPointPosAtReleased(pos, &point->mPosition);
+	point->mPosReturnRate = (point->mDefaultPosOnWire - pos) / 1000.0f;
 }
 
 void TMapWire::release()
@@ -243,7 +244,7 @@ void TMapWire::getPointInfoAtHanged(f32 pos, TMapWirePoint* point)
 {
 	JGeometry::TVec3<f32> outPoint;
 	getPointPosAtHanged(pos, &outPoint);
-	point->unk00.set(outPoint.x, outPoint.y, outPoint.z);
+	point->mPosition.set(outPoint.x, outPoint.y, outPoint.z);
 }
 
 void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
@@ -261,23 +262,23 @@ void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 
 	TMapWirePoint* refPoint1 = &mMapWirePoints[0];
 	if (mFootLength < mHangPos * unk30) {
-		refPoint1->unk18 = mHangReferencePos1;
+		refPoint1->mPosOnWire = mHangReferencePos1;
 		JGeometry::TVec3<f32> point;
 		getPointInfoAtHanged(mHangReferencePos1, refPoint1);
 	} else {
-		refPoint1->unk18 = mHangPos;
-		refPoint1->unk00.set(mHangOrBouncePoint.x, mHangOrBouncePoint.y,
-		                     mHangOrBouncePoint.z);
+		refPoint1->mPosOnWire = mHangPos;
+		refPoint1->mPosition.set(mHangOrBouncePoint.x, mHangOrBouncePoint.y,
+		                         mHangOrBouncePoint.z);
 	}
 
 	TMapWirePoint* refPoint2 = &mMapWirePoints[1];
 	if (mFootLength < (1.0f - mHangPos) * unk30) {
-		refPoint2->unk18 = mHangReferencePos2;
+		refPoint2->mPosOnWire = mHangReferencePos2;
 		getPointInfoAtHanged(mHangReferencePos2, refPoint2);
 	} else {
-		refPoint2->unk18 = mHangPos;
-		refPoint2->unk00.set(mHangOrBouncePoint.x, mHangOrBouncePoint.y,
-		                     mHangOrBouncePoint.z);
+		refPoint2->mPosOnWire = mHangPos;
+		refPoint2->mPosition.set(mHangOrBouncePoint.x, mHangOrBouncePoint.y,
+		                         mHangOrBouncePoint.z);
 	}
 }
 
@@ -425,10 +426,10 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 	for (int i = 0; i < mNumMapWirePoints; i++) {
 		TMapWirePoint* point = &mMapWirePoints[i];
 
-		f32 pos      = (f32)(i + 1) / (f32)(mNumMapWirePoints);
-		point->unk18 = point->unk1C = pos;
+		f32 pos           = (f32)(i + 1) / (f32)(mNumMapWirePoints);
+		point->mPosOnWire = point->mDefaultPosOnWire = pos;
 
-		getPointPosDefault(point->unk18, &point->unk0C);
+		getPointPosDefault(point->mPosOnWire, &point->mDefaultPosition);
 
 		point->reset();
 	}
