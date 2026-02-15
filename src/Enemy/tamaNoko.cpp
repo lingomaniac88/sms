@@ -73,7 +73,7 @@ TTamaNokoFlower::TTamaNokoFlower(const TLiveActor* param_1, int param_2,
 void TTamaNokoFlower::perform(u32 param_1, JDrama::TGraphics* param_2)
 {
 	if (param_1 & 1) {
-		if (gpMarDirector->checkUnk124Thing1()) {
+		if (gpMarDirector->isTalkModeNow()) {
 			if (unk35 != 0 && unk1C == 0) {
 				if (gpMarDirector->checkUnk124Thing2()) {
 					unk1C = 1;
@@ -139,8 +139,7 @@ void TTamaNokoFlower::perform(u32 param_1, JDrama::TGraphics* param_2)
 		}
 	}
 
-	if (gpMarDirector->checkUnk124Thing2()
-	    && gpMarDirector->checkUnk124Thing1()) {
+	if (gpMarDirector->checkUnk124Thing2() && gpMarDirector->isTalkModeNow()) {
 		if (param_1 & 0x4)
 			unk18->viewCalc();
 
@@ -383,7 +382,7 @@ BOOL TTamaNoko::receiveMessage(THitActor* param_1, u32 param_2)
 	if (param_2 == 13) {
 		mHitPoints = 0;
 		onLiveFlag(LIVE_FLAG_DEAD);
-		onHitFlag(HIT_FLAG_UNK1);
+		onHitFlag(HIT_FLAG_NO_COLLISION);
 	}
 
 	if (param_2 == HIT_MESSAGE_SPRAYED_BY_WATER) {
@@ -506,7 +505,7 @@ void TTamaNoko::calcRootMatrix()
 
 void TTamaNoko::requestShadow()
 {
-	if (!checkLiveFlag(LIVE_FLAG_DEAD | LIVE_FLAG_UNK8 | LIVE_FLAG_UNK2)) {
+	if (!checkLiveFlag(LIVE_FLAG_DEAD | LIVE_FLAG_UNK8 | LIVE_FLAG_HIDDEN)) {
 		if (!checkLiveFlag(LIVE_FLAG_UNK200 | LIVE_FLAG_CLIPPED_OUT)
 		    || checkLiveFlag(LIVE_FLAG_UNK400)) {
 			TCircleShadowRequest local_2c;
