@@ -242,6 +242,8 @@ void TMapWire::getPointPosAtHanged(f32 pos, JGeometry::TVec3<f32>* out) const
 
 void TMapWire::getPointInfoAtHanged(f32 pos, TMapWirePoint* point)
 {
+	point->mPosOnWire = pos;
+
 	JGeometry::TVec3<f32> outPoint;
 	getPointPosAtHanged(pos, &outPoint);
 	point->mPosition.set(outPoint.x, outPoint.y, outPoint.z);
@@ -262,8 +264,6 @@ void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 
 	TMapWirePoint* refPoint1 = &mMapWirePoints[0];
 	if (mFootLength < mHangPos * unk30) {
-		refPoint1->mPosOnWire = mHangReferencePos1;
-		JGeometry::TVec3<f32> point;
 		getPointInfoAtHanged(mHangReferencePos1, refPoint1);
 	} else {
 		refPoint1->mPosOnWire = mHangPos;
@@ -273,7 +273,6 @@ void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 
 	TMapWirePoint* refPoint2 = &mMapWirePoints[1];
 	if (mFootLength < (1.0f - mHangPos) * unk30) {
-		refPoint2->mPosOnWire = mHangReferencePos2;
 		getPointInfoAtHanged(mHangReferencePos2, refPoint2);
 	} else {
 		refPoint2->mPosOnWire = mHangPos;
