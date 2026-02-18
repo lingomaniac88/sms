@@ -110,6 +110,13 @@ void TMapWire::drawUpper() const
 	GXEnd();
 }
 
+// very fake, but it helps fix some inlining issues.
+// see TODO in getPointPosAtReleased
+static f32 gppar(const TMapWire* wire, f32 pos)
+{
+	return wire->getPointPowerAtReleased(pos);
+}
+
 f32 TMapWire::getPointPowerAtReleased(f32 pos) const
 {
 	// 1 = default height, 0 = stretched all the way down
@@ -125,13 +132,14 @@ f32 TMapWire::getPointPowerAtReleased(f32 pos) const
 
 void TMapWire::getPointPosAtReleased(f32 pos, JGeometry::TVec3<f32>* out) const
 {
+	// TODO: Something weird is happening with how this gets inlined
 	JGeometry::TVec3<f32> local_a4;
 	getPointPosOnLine(pos, &local_a4);
 
 	JGeometry::TVec3<f32> aTStack_98;
 	getPointPosDefault(pos, &aTStack_98);
 
-	f32 power = getPointPowerAtReleased(pos);
+	f32 power = gppar(this, pos); // TODO: fix this inlining issue
 	f32 yAdjusted
 	    = local_a4.y
 	      + (1.0f - mBounceRemainingPower) * (aTStack_98.y - local_a4.y)
@@ -396,6 +404,8 @@ void TMapWire::initTipPoints(const TCubeGeneralInfo* cubeInfo)
 	wireTransform.setEular((s16)(cubeInfo->getUnk18().x / 180.0f * 32768.0f),
 	                       (s16)(cubeInfo->getUnk18().y / 180.0f * 32768.0f),
 	                       (s16)(cubeInfo->getUnk18().z / 180.0f * 32768.0f));
+	// TODO: The compiler is optimizing this to only multiply out the z part
+	// since the other components are 0. Why?
 	wireTransform.mult33(halfWire);
 
 	mStartPoint.x = cubeInfo->getUnkC().x - halfWire.x;
