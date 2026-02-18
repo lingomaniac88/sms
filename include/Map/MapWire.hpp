@@ -68,8 +68,8 @@ public:
 	/* 0x24 */ f32 unk24;
 	/* 0x28 */ f32 unk28;
 	/* 0x2C */ f32 unk2C;
-	/* 0x30 */ f32 unk30;
-	/* 0x34 */ f32 unk34;
+	/* 0x30 */ f32 mWireLength;
+	/* 0x34 */ f32 mWireHAngle; // in degrees
 	/* 0x38 */ f32 mWireSag;
 	/* 0x3C */ J3DModel* mStartFittingModel;
 	/* 0x40 */ J3DModel* mEndFittingModel;
@@ -84,7 +84,7 @@ public:
 	/* 0x60 */ f32 mBounceRemainingPower;
 	/* 0x64 */ f32 mBounceAmplitude;
 	/* 0x68 */ f32 mBounceDecayRate;
-	/* 0x6C */ JGeometry::TVec2<f32> unk6C;
+	/* 0x6C */ JGeometry::TVec2<f32> mDrawAxes;
 	/* 0x74 */ f32 mHangReferencePos1;
 	/* 0x78 */ f32 mHangReferencePos2;
 	/* 0x7C */ u16 mState; // Probably an enum?

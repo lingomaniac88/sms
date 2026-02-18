@@ -39,8 +39,8 @@ f32 TMapWire::mDrawHeight     = 6.0f;
 
 void TMapWire::drawLower() const
 {
-	f32 xOffset = unk6C.x * mDrawWidth;
-	f32 zOffset = unk6C.y * mDrawWidth;
+	f32 xOffset = mDrawAxes.x * mDrawWidth;
+	f32 zOffset = mDrawAxes.y * mDrawWidth;
 
 	GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, (mNumActiveMapWirePoints + 2) * 2);
 
@@ -85,8 +85,8 @@ void TMapWire::drawLower() const
 
 void TMapWire::drawUpper() const
 {
-	f32 xOffset = unk6C.x * mDrawWidth;
-	f32 zOffset = unk6C.y * mDrawWidth;
+	f32 xOffset = mDrawAxes.x * mDrawWidth;
+	f32 zOffset = mDrawAxes.y * mDrawWidth;
 
 	GXBegin(GX_TRIANGLESTRIP, GX_VTXFMT0, (mNumActiveMapWirePoints + 2) * 2);
 
@@ -265,13 +265,13 @@ void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 	                       mtx[2][3]); // translate portion of matrix
 	mHangPos = getPosInWire(mHangOrBouncePoint);
 
-	mHangReferencePos1 = mHangPos - mFootLength / unk30;
-	mHangReferencePos2 = mHangPos + mFootLength / unk30;
+	mHangReferencePos1 = mHangPos - mFootLength / mWireLength;
+	mHangReferencePos2 = mHangPos + mFootLength / mWireLength;
 
 	mNumActiveMapWirePoints = 2;
 
 	TMapWirePoint* refPoint1 = &mMapWirePoints[0];
-	if (mFootLength < mHangPos * unk30) {
+	if (mFootLength < mHangPos * mWireLength) {
 		getPointInfoAtHanged(mHangReferencePos1, refPoint1);
 	} else {
 		refPoint1->mPosOnWire = mHangPos;
@@ -280,7 +280,7 @@ void TMapWire::setFootPointsAtHanged(MtxPtr mtx)
 	}
 
 	TMapWirePoint* refPoint2 = &mMapWirePoints[1];
-	if (mFootLength < (1.0f - mHangPos) * unk30) {
+	if (mFootLength < (1.0f - mHangPos) * mWireLength) {
 		getPointInfoAtHanged(mHangReferencePos2, refPoint2);
 	} else {
 		refPoint2->mPosOnWire = mHangPos;
@@ -397,7 +397,7 @@ void TMapWire::getPointPosDefault(f32 pos, JGeometry::TVec3<f32>* out) const
 
 void TMapWire::initTipPoints(const TCubeGeneralInfo* cubeInfo)
 {
-	JGeometry::TVec3<f32> halfWire(0.0f, 0.0f, unk30 * 0.5f);
+	JGeometry::TVec3<f32> halfWire(0.0f, 0.0f, mWireLength * 0.5f);
 
 	JGeometry::TRotation3<TMtx33f> wireTransform;
 	wireTransform.identity();
@@ -426,7 +426,7 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 
 	mMapWirePoints = new TMapWirePoint[mNumMapWirePoints];
 
-	unk30 = cubeInfo->getUnk24().z;
+	mWireLength = cubeInfo->getUnk24().z;
 
 	initTipPoints(cubeInfo);
 
@@ -444,16 +444,16 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 	}
 
 	if (mEndPoint.x != mStartPoint.x) {
-		f32 angle = atanf((mEndPoint.z - mStartPoint.z)
-		                  / (mEndPoint.x - mStartPoint.x));
-		unk34     = -angle * 180.0f / M_PI + 90.0f;
+		f32 angle   = atanf((mEndPoint.z - mStartPoint.z)
+		                    / (mEndPoint.x - mStartPoint.x));
+		mWireHAngle = -angle * 180.0f / M_PI + 90.0f;
 	} else {
-		unk34 = 0.0f;
+		mWireHAngle = 0.0f;
 	}
 
-	unk6C.set(mEndPoint.x - mStartPoint.x, mEndPoint.z - mStartPoint.z);
-	unk6C.normalize();
-	unk6C.rotate(M_PI / 2);
+	mDrawAxes.set(mEndPoint.x - mStartPoint.x, mEndPoint.z - mStartPoint.z);
+	mDrawAxes.normalize();
+	mDrawAxes.rotate(M_PI / 2);
 
 	mStartFittingModel
 	    = SMS_CreatePartsModel("/common/map/WireFitting.bmd", 0x10210000);
@@ -490,7 +490,7 @@ void TMapWire::init(const TCubeGeneralInfo* cubeInfo)
 
 TMapWire::TMapWire()
 {
-	unk34                   = 0.0f;
+	mWireHAngle             = 0.0f;
 	mWireSag                = 0.0f;
 	mNumActiveMapWirePoints = 0;
 	mNumMapWirePoints       = 0;
@@ -505,7 +505,7 @@ TMapWire::TMapWire()
 	mStartPoint.zero();
 	mEndPoint.zero();
 	mWireSpan.zero();
-	unk6C.zero();
+	mDrawAxes.zero();
 	mHangOrBouncePoint.zero();
 	mStartFittingModel = nullptr;
 	mEndFittingModel   = nullptr;
