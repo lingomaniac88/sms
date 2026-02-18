@@ -87,7 +87,7 @@ public:
 	/* 0x6C */ JGeometry::TVec2<f32> mDrawAxes;
 	/* 0x74 */ f32 mHangReferencePos1;
 	/* 0x78 */ f32 mHangReferencePos2;
-	/* 0x7C */ u16 mState; // Probably an enum?
+	/* 0x7C */ u16 mState;
 };
 
 #endif
