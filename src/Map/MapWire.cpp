@@ -133,19 +133,19 @@ f32 TMapWire::getPointPowerAtReleased(f32 pos) const
 void TMapWire::getPointPosAtReleased(f32 pos, JGeometry::TVec3<f32>* out) const
 {
 	// TODO: Something weird is happening with how this gets inlined
-	JGeometry::TVec3<f32> local_a4;
-	getPointPosOnLine(pos, &local_a4);
+	JGeometry::TVec3<f32> linePoint;
+	getPointPosOnLine(pos, &linePoint);
 
-	JGeometry::TVec3<f32> aTStack_98;
-	getPointPosDefault(pos, &aTStack_98);
+	JGeometry::TVec3<f32> defaultPoint;
+	getPointPosDefault(pos, &defaultPoint);
 
 	f32 power = gppar(this, pos); // TODO: fix this inlining issue
 	f32 yAdjusted
-	    = local_a4.y
-	      + (1.0f - mBounceRemainingPower) * (aTStack_98.y - local_a4.y)
+	    = linePoint.y
+	      + (1.0f - mBounceRemainingPower) * (defaultPoint.y - linePoint.y)
 	      + power * mHangOrBouncePoint.y;
 
-	out->set(local_a4.x, yAdjusted, local_a4.z);
+	out->set(linePoint.x, yAdjusted, linePoint.z);
 }
 
 void TMapWire::updatePointAtReleased(int index)
